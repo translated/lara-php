@@ -143,7 +143,7 @@ class HttpClient
             }
         } else {
             $headers["Content-Type"] = "application/json";
-            $requestBody = json_encode($body);
+            if ($body) $requestBody = json_encode($body);
         }
 
         $headers["Authorization"] = "Lara $this->accessKeyId:" . $this->sign($method, $path, $headers);
