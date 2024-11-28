@@ -1,0 +1,24 @@
+{
+  "name": "translated/lara-sdk",
+  "type": "library",
+  "description": "Official Lara SDK for PHP",
+  "authors": [
+    {
+      "name": "Translated",
+      "email": "info@translated.com",
+      "homepage": "https://translated.com/"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/translated/lara-php",
+  "require": {
+    "php": ">=5.6.0",
+    "ext-curl": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lara\\": "src/"
+    }
+  }
+}
