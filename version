@@ -1,0 +1,126 @@
+#!/usr/bin/env php
+<?php
+
+function halt($message)
+{
+    fwrite(STDERR, $message . "\n");
+    exit(1);
+}
+
+function updateComposerVersion($type)
+{
+    $composerFile = 'composer.json';
+    if (!file_exists($composerFile)) halt("Error: composer.json not found in the current directory.");
+
+    $composerData = json_decode(file_get_contents($composerFile), true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) halt("Error: Unable to parse composer.json. Check for syntax errors.");
+    if (!isset($composerData['version'])) halt("Error: Version not found in composer.json.");
+
+    $version = $composerData['version'];
+    if (!preg_match('/^(\d+)\.(\d+)\.(\d+)$/', $version, $matches))
+        halt("Error: Version in composer.json must follow semantic versioning (e.g., 1.2.3).");
+
+    list(, $major, $minor, $patch) = $matches;
+
+    switch ($type) {
+        case 'major':
+            $major++;
+            $minor = 0;
+            $patch = 0;
+            break;
+        case 'minor':
+            $minor++;
+            $patch = 0;
+            break;
+        case 'patch':
+            $patch++;
+            break;
+    }
+
+    $newVersion = "{$major}.{$minor}.{$patch}";
+    $composerData['version'] = $newVersion;
+
+    if (file_put_contents($composerFile, json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) === false)
+        halt("Error: Failed to write updated composer.json.");
+
+    return $newVersion;
+}
+
+function updateVersionPHP($newVersion) {
+    $versionFile = "src/Version.php";
+    if (!file_exists($versionFile)) halt("Error: src/Version.php not found.");
+
+    $newLines = [];
+    $versionUpdated = false;
+
+    $fileHandle = fopen($versionFile, 'r');
+    if (!$fileHandle) halt("Error: Unable to read the file at {$versionFile}.");
+
+    while (($line = fgets($fileHandle)) !== false) {
+        if (preg_match("/const\s+SDK_VERSION\s*=\s*'(\d+)\.(\d+)\.(\d+)'\s*;\s*/", $line, $matches)) {
+            $line = "const SDK_VERSION = \"$newVersion\";\n";
+            $versionUpdated = true;
+        }
+
+        $newLines[] = $line;
+    }
+
+    fclose($fileHandle);
+
+    if (!$versionUpdated) halt("Error: SDK_VERSION constant not found in src/Version.php.");
+
+    $fileHandle = fopen($versionFile, 'w');
+    if (!$fileHandle) halt("Error: Unable to write the file at {$versionFile}.");
+
+    foreach ($newLines as $line)
+        fwrite($fileHandle, $line);
+
+    fclose($fileHandle);
+}
+
+function checkGitStatus() {
+    exec('git status --porcelain', $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to check git status.");
+    if (!empty($output)) halt("Error: There are uncommitted changes in the working directory.");
+
+    exec('git tag --points-at HEAD', $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to check git tags.");
+    if (!empty($output)) halt("Error: HEAD is already tagged.");
+
+    exec("git branch --show-current", $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to check current branch.");
+    if ($output[0] !== 'main') halt("Error: You must be on the main branch to update the version.");
+}
+
+function gitTag($version) {
+    exec("git add .", $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to stage changes.");
+
+    exec("git commit -m \"v$version\"", $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to commit changes.");
+
+    exec("git tag v$version", $output, $returnCode);
+    if ($returnCode !== 0) halt("Error: Unable to create git tag.");
+
+    fwrite(STDOUT, "Tag v$version created.\n");
+}
+
+# Argument parsing -----------------------------------------------------------------------------------------------------
+
+if ($argc !== 2) halt("Usage: {$argv[0]} [major|minor|patch]");
+
+$allowedTypes = ['major', 'minor', 'patch'];
+$type = $argv[1];
+
+if (!in_array($type, $allowedTypes, true))
+    halt("Invalid argument. Use 'major', 'minor', or 'patch'.");
+
+# Main -----------------------------------------------------------------------------------------------------------------
+
+checkGitStatus();
+
+$newVersion = updateComposerVersion($type);
+updateVersionPHP($newVersion);
+
+gitTag($newVersion);
