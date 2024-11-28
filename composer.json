@@ -1,6 +1,7 @@
 {
   "name": "translated/lara-sdk",
   "type": "library",
+  "version": "0.0.0",
   "description": "Official Lara SDK for PHP",
   "authors": [
     {
