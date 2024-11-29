@@ -81,6 +81,7 @@ class Memories
     /**
      * @param $ids string|string[]
      * @return Memory|Memory[]
+     * @throws LaraException
      */
     public function connect($ids)
     {
