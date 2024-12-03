@@ -51,9 +51,7 @@ class TextBlock implements \JsonSerializable
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
-        return [
-            "text" => $this->text,
-            "translatable" => $this->translatable
-        ];
+        return get_object_vars($this);
     }
+
 }

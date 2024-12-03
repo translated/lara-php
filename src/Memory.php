@@ -135,9 +135,11 @@ class Memory implements \JsonSerializable
         return $this->id;
     }
 
+    // Compatibility layer for PHP 8.1+
     #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return get_object_vars($this);
     }
+
 }

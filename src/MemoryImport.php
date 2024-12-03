@@ -2,7 +2,7 @@
 
 namespace Lara;
 
-class MemoryImport
+class MemoryImport implements \JsonSerializable
 {
     /**
      * @param $response array
@@ -96,6 +96,13 @@ class MemoryImport
     public function __toString()
     {
         return $this->id;
+    }
+
+    // Compatibility layer for PHP 8.1+
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 
 }
