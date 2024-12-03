@@ -2,7 +2,7 @@
 
 namespace Lara;
 
-class Memory
+class Memory implements \JsonSerializable
 {
     /**
      * @param $response array
@@ -135,4 +135,9 @@ class Memory
         return $this->id;
     }
 
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
 }

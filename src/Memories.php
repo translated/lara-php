@@ -95,4 +95,30 @@ class Memories
 
         return $isArray ? $memories : $memories[0];
     }
+
+    /**
+     * @param $id string
+     * @param $tmx string
+     * @param $gzip bool
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function importTmx($id, $tmx, $gzip = false)
+    {
+        return MemoryImport::fromResponse($this->client->post("/memories/$id/import", [
+            'compression' => $gzip ? 'gzip' : null
+        ], [
+            'tmx' => $tmx
+        ]));
+    }
+
+    /**
+     * @param $id string
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function getImportStatus($id)
+    {
+        return MemoryImport::fromResponse($this->client->get("/memories/imports/$id"));
+    }
 }
