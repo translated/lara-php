@@ -8,7 +8,7 @@ class Memories
      * @var internal\HttpClient
      */
     private $client;
-    private $pollingInterval = 2000;
+    private $pollingInterval = 2;
 
     public function __construct($client)
     {
@@ -95,4 +95,118 @@ class Memories
 
         return $isArray ? $memories : $memories[0];
     }
+
+    /**
+     * @param $id string
+     * @param $tmx string
+     * @param $gzip bool
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function importTmx($id, $tmx, $gzip = false)
+    {
+        return MemoryImport::fromResponse($this->client->post("/memories/$id/import", [
+            'compression' => $gzip ? 'gzip' : null
+        ], [
+            'tmx' => $tmx
+        ]));
+    }
+
+    /**
+     * @param $id string
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function getImportStatus($id)
+    {
+        return MemoryImport::fromResponse($this->client->get("/memories/imports/$id"));
+    }
+
+    /**
+     * @param $id string|string[]
+     * @param $source string
+     * @param $target string
+     * @param $sentence string
+     * @param $translation string
+     * @param $tuid string|null
+     * @param $sentenceBefore string|null
+     * @param $sentenceAfter string|null
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function addTranslation($id, $source, $target, $sentence, $translation,
+                                   $tuid = null, $sentenceBefore = null, $sentenceAfter = null)
+    {
+        $body = [
+            'source' => $source,
+            'target' => $target,
+            'sentence' => $sentence,
+            'translation' => $translation,
+            'tuid' => $tuid,
+            'sentence_before' => $sentenceBefore,
+            'sentence_after' => $sentenceAfter
+        ];
+
+        if (is_array($id)) {
+            $body['ids'] = $id;
+            return MemoryImport::fromResponse($this->client->put("/memories/content", $body));
+        } else {
+            return MemoryImport::fromResponse($this->client->put("/memories/$id/content", $body));
+        }
+    }
+
+    /**
+     * @param $id string|string[]
+     * @param $source string
+     * @param $target string
+     * @param $sentence string
+     * @param $translation string
+     * @param $tuid string|null
+     * @param $sentenceBefore string|null
+     * @param $sentenceAfter string|null
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function deleteTranslation($id, $source, $target, $sentence, $translation,
+                                      $tuid = null, $sentenceBefore = null, $sentenceAfter = null)
+    {
+        $body = [
+            'source' => $source,
+            'target' => $target,
+            'sentence' => $sentence,
+            'translation' => $translation,
+            'tuid' => $tuid,
+            'sentence_before' => $sentenceBefore,
+            'sentence_after' => $sentenceAfter
+        ];
+
+        if (is_array($id)) {
+            $body['ids'] = $id;
+            return MemoryImport::fromResponse($this->client->delete("/memories/content", $body));
+        } else {
+            return MemoryImport::fromResponse($this->client->delete("/memories/$id/content", $body));
+        }
+    }
+
+    /**
+     * @param $import MemoryImport
+     * @param $maxWaitTime int seconds
+     * @return MemoryImport
+     * @throws LaraException
+     */
+    public function waitForImport($import, $maxWaitTime = 0)
+    {
+        $start = time();
+        while ($import->getProgress() < 1.0) {
+            if ($maxWaitTime > 0 && time() - $start > $maxWaitTime)
+                throw new LaraTimeoutException();
+
+            sleep($this->pollingInterval);
+
+            $import = $this->getImportStatus($import->getId());
+        }
+
+        return $import;
+    }
+
 }

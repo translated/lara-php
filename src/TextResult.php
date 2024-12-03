@@ -2,7 +2,7 @@
 
 namespace Lara;
 
-class TextResult
+class TextResult implements \JsonSerializable
 {
     /**
      * @param $response array
@@ -78,6 +78,13 @@ class TextResult
     public function getAdaptedTo()
     {
         return $this->adaptedTo;
+    }
+
+    // Compatibility layer for PHP 8.1+
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 
 }

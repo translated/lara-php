@@ -179,5 +179,5 @@ class TranslateOptions
     {
         return $this->cacheTTLSeconds;
     }
-    
+
 }
