@@ -1,6 +1,6 @@
 <?php
 
-namespace Lara\internal;
+namespace Lara\Internal;
 
 use CURLFile;
 use Lara\LaraApiException;

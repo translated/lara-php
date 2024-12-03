@@ -5,7 +5,7 @@ namespace Lara;
 class Memories
 {
     /**
-     * @var internal\HttpClient
+     * @var Internal\HttpClient
      */
     private $client;
     private $pollingInterval = 2;

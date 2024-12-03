@@ -5,7 +5,7 @@ namespace Lara;
 class Translator
 {
     /**
-     * @var internal\HttpClient
+     * @var Internal\HttpClient
      */
     private $client;
 
@@ -23,7 +23,7 @@ class Translator
         $serverUrl = $options ? $options->getServerUrl() : null;
         $serverUrl = $serverUrl ?: 'https://api.laratranslate.com';
 
-        $this->client = new internal\HttpClient($serverUrl, $credentials->getAccessKeyId(), $credentials->getAccessKeySecret());
+        $this->client = new Internal\HttpClient($serverUrl, $credentials->getAccessKeyId(), $credentials->getAccessKeySecret());
         $this->memories = new Memories($this->client);
     }
 
