@@ -58,7 +58,7 @@ function updateVersionPHP($newVersion) {
     if (!$fileHandle) halt("Error: Unable to read the file at {$versionFile}.");
 
     while (($line = fgets($fileHandle)) !== false) {
-        if (preg_match("/const\s+SDK_VERSION\s*=\s*'(\d+)\.(\d+)\.(\d+)'\s*;\s*/", $line, $matches)) {
+        if (preg_match("/const\s+SDK_VERSION\s*=\s*['\"](\d+)\.(\d+)\.(\d+)['\"]\s*;\s*/", $line)) {
             $line = "const SDK_VERSION = \"$newVersion\";\n";
             $versionUpdated = true;
         }
