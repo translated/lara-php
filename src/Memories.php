@@ -90,7 +90,7 @@ class Memories
         $memories = array_map(function ($e) {
             return Memory::fromResponse($e);
         }, $this->client->post("/memories/connect", [
-            'memories' => $ids
+            'ids' => $ids
         ]));
 
         return $isArray ? $memories : $memories[0];
