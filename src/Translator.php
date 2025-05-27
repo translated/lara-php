@@ -15,6 +15,11 @@ class Translator
     public $memories;
 
     /**
+     * @var Documents
+     */
+    public $documents;
+
+    /**
      * @param $credentials LaraCredentials
      * @param $options TranslatorOptions | null
      */
@@ -25,6 +30,7 @@ class Translator
 
         $this->client = new Internal\HttpClient($serverUrl, $credentials->getAccessKeyId(), $credentials->getAccessKeySecret());
         $this->memories = new Memories($this->client);
+        $this->documents = new Documents($this->client);
     }
 
     /**
