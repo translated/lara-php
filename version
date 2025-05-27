@@ -100,7 +100,7 @@ function gitTag($version) {
     exec("git commit -m \"v$version\"", $output, $returnCode);
     if ($returnCode !== 0) halt("Error: Unable to commit changes.");
 
-    exec("git tag v$version", $output, $returnCode);
+    exec("git tag -a v$version -m v$version", $output, $returnCode);
     if ($returnCode !== 0) halt("Error: Unable to create git tag.");
 
     fwrite(STDOUT, "Tag v$version created.\n");
