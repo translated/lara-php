@@ -6,12 +6,11 @@
     "authors": [
         {
             "name": "Translated",
-            "email": "support@laratranslate.com",
-            "homepage": "https://laratranslate.com/"
+            "email": "support@laratranslate.com"
         }
     ],
     "license": "MIT",
-    "homepage": "https://github.com/translated/lara-php",
+    "homepage": "https://laratranslate.com/",
     "require": {
         "php": ">=5.6.0",
         "ext-curl": "*",
