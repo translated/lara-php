@@ -44,14 +44,19 @@ class Documents
             "target" => $target,
             "s3key" => $s3Upload->getFields()['key']
         ];
+        $headers = [];
 
         if ($options) {
             foreach (array_filter($options->toParams()) as $key => $value) {
                 $data[$key] = $value;
             }
+
+            if ($options->isNoTrace()) {
+                $headers['X-No-Trace'] = 'true';
+            }
         }
 
-        return Document::fromResponse($this->client->post("/documents", $data));
+        return Document::fromResponse($this->client->post("/documents", $data, null, $headers));
     }
 
     /**
@@ -86,10 +91,10 @@ class Documents
     }
 
     /**
-     * @param $filepath
-     * @param $source
-     * @param $target
-     * @param $options
+     * @param $filepath string
+     * @param $source string
+     * @param $target string
+     * @param $options DocumentTranslateOptions|null
      * @return resource
      * @throws LaraException
      * @throws LaraTimeoutException
@@ -99,6 +104,8 @@ class Documents
         $documentUploadOptions = new DocumentUploadOptions();
         if ($options->getAdaptTo())
             $documentUploadOptions.setAdaptTo($options->getAdaptTo());
+        if ($options->isNoTrace())
+            $documentUploadOptions->setNoTrace($options->isNoTrace());
 
         $documentDownloadOptions = new DocumentDownloadOptions();
         if ($options->getOutputFormat())

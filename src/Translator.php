@@ -53,6 +53,7 @@ class Translator
     public function translate($text, $source, $target, $options = null)
     {
         $data = ["q" => $text, "target" => $target];
+        $headers = [];
 
         if ($source) $data["source"] = $source;
 
@@ -66,9 +67,12 @@ class Translator
             if ($options->getPriority() !== null) $data["priority"] = $options->getPriority();
             if ($options->getUseCache() !== null) $data["use_cache"] = $options->getUseCache();
             if ($options->getCacheTTLSeconds() !== null) $data["cache_ttl"] = $options->getCacheTTLSeconds();
+
+            if ($options->isNoTrace() !== null) $headers["X-No-Trace"] = "true";
         }
 
-        return TextResult::fromResponse($this->client->post("/translate", $data));
+
+        return TextResult::fromResponse($this->client->post("/translate", $data, null, $headers));
     }
 
 }

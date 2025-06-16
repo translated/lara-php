@@ -6,7 +6,7 @@ class DocumentTranslateOptions
 {
     private $adaptTo = null;
     private $outputFormat = null;
-
+    private $noTrace = null;
 
     public function __construct($options = [])
     {
@@ -14,6 +14,8 @@ class DocumentTranslateOptions
             $this->setAdaptTo($options['adaptTo']);
         if (isset($options['outputFormat']))
             $this->setOutputFormat($options['outputFormat']);
+        if (isset($options['noTrace']))
+            $this->setNoTrace($options['noTrace']);
     }
 
     /**
@@ -46,6 +48,22 @@ class DocumentTranslateOptions
     public function getOutputFormat()
     {
         return $this->outputFormat;
+    }
+
+    /**
+     * @param $noTrace bool|null
+     */
+    public function setNoTrace($noTrace)
+    {
+        $this->noTrace = $noTrace;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isNoTrace()
+    {
+        return $this->noTrace;
     }
 
     /**

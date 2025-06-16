@@ -13,6 +13,7 @@ class TranslateOptions
     private $priority = null;
     private $useCache = null;
     private $cacheTTLSeconds = null;
+    private $noTrace = null;
 
     public function __construct($options = [])
     {
@@ -34,6 +35,8 @@ class TranslateOptions
             $this->setUseCache($options['useCache']);
         if (isset($options['cacheTTLSeconds']))
             $this->setCacheTTLSeconds($options['cacheTTLSeconds']);
+        if (isset($options['noTrace']))
+            $this->setNoTrace($options['noTrace']);
     }
 
     /**
@@ -178,6 +181,22 @@ class TranslateOptions
     public function getCacheTTLSeconds()
     {
         return $this->cacheTTLSeconds;
+    }
+
+    /**
+     * @param $noTrace bool|null
+     */
+    public function setNoTrace($noTrace)
+    {
+        $this->noTrace = $noTrace;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isNoTrace()
+    {
+        return $this->noTrace;
     }
 
 }

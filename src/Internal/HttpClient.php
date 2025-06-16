@@ -49,9 +49,9 @@ class HttpClient
      * @return mixed
      * @throws LaraException
      */
-    public function get($path, $params = null)
+    public function get($path, $params = null, $headers = null)
     {
-        return $this->request('GET', $path, $params);
+        return $this->request('GET', $path, $params, null, $headers);
     }
 
     /**
@@ -60,9 +60,9 @@ class HttpClient
      * @return mixed
      * @throws LaraException
      */
-    public function delete($path, $params = null)
+    public function delete($path, $params = null, $headers = null)
     {
-        return $this->request('DELETE', $path, $params);
+        return $this->request('DELETE', $path, $params, null, $headers);
     }
 
     /**
@@ -72,9 +72,9 @@ class HttpClient
      * @return mixed
      * @throws LaraException
      */
-    public function post($path, $body = null, $files = null)
+    public function post($path, $body = null, $files = null, $headers = null)
     {
-        return $this->request('POST', $path, $body, $files);
+        return $this->request('POST', $path, $body, $files, $headers);
     }
 
     /**
@@ -84,9 +84,9 @@ class HttpClient
      * @return mixed
      * @throws LaraException
      */
-    public function put($path, $body = null, $files = null)
+    public function put($path, $body = null, $files = null, $headers = null)
     {
-        return $this->request('PUT', $path, $body, $files);
+        return $this->request('PUT', $path, $body, $files, $headers);
     }
 
     /**
@@ -97,7 +97,7 @@ class HttpClient
      * @return mixed
      * @throws LaraException
      */
-    private function request($method, $path, $body = null, $files = null)
+    private function request($method, $path, $body = null, $files = null, $headers = null)
     {
         if ($path[0] != '/')
             $path = '/' . $path;
@@ -105,7 +105,7 @@ class HttpClient
         $url = $this->baseUrl . $path;
 
 
-        $headers = [
+        $_headers = [
             "X-HTTP-Method-Override" => $method,
             "X-Lara-Date" => gmdate("D, d M Y H:i:s") . " GMT",
             "X-Lara-SDK-Name" => "lara-php",
@@ -113,7 +113,10 @@ class HttpClient
         ];
 
         if ($this->extraHeaders)
-            $headers = array_merge($headers, $this->extraHeaders);
+            $_headers = array_merge($_headers, $this->extraHeaders);
+
+        if ($headers)
+            $_headers = array_merge($_headers, $headers);
 
         if ($body) {
             $body = array_filter($body, function ($el) {
@@ -125,7 +128,7 @@ class HttpClient
 
             if ($body) {
                 $jsonBody = json_encode($body);
-                $headers["Content-MD5"] = md5($jsonBody);
+                $_headers["Content-MD5"] = md5($jsonBody);
             }
         }
 
@@ -133,7 +136,7 @@ class HttpClient
 
         if ($files) {
             $requestBody = $body ?: [];
-            $headers["Content-Type"] = "multipart/form-data";
+            $_headers["Content-Type"] = "multipart/form-data";
 
             foreach (array_filter($files) as $key => $value) {
                 if (!file_exists($value))
@@ -142,11 +145,11 @@ class HttpClient
                 $requestBody[$key] = new CURLFile($value);
             }
         } else {
-            $headers["Content-Type"] = "application/json";
+            $_headers["Content-Type"] = "application/json";
             if ($body) $requestBody = json_encode($body);
         }
 
-        $headers["Authorization"] = "Lara $this->accessKeyId:" . $this->sign($method, $path, $headers);
+        $_headers["Authorization"] = "Lara $this->accessKeyId:" . $this->sign($method, $path, $_headers);
 
         curl_reset($this->curl);
         curl_setopt_array($this->curl, [
@@ -154,7 +157,7 @@ class HttpClient
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
                 return "$key: $value";
-            }, array_keys($headers), $headers),
+            }, array_keys($_headers), $_headers),
             CURLOPT_POST => 1,
             CURLOPT_POSTFIELDS => $requestBody
         ]);
