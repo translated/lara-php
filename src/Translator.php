@@ -20,6 +20,11 @@ class Translator
     public $documents;
 
     /**
+     * @var Glossaries
+     */
+    public $glossaries;
+
+    /**
      * @param $credentials LaraCredentials
      * @param $options TranslatorOptions | null
      */
@@ -31,6 +36,7 @@ class Translator
         $this->client = new Internal\HttpClient($serverUrl, $credentials->getAccessKeyId(), $credentials->getAccessKeySecret());
         $this->memories = new Memories($this->client);
         $this->documents = new Documents($this->client);
+        $this->glossaries = new Glossaries($this->client);
     }
 
     /**
@@ -63,6 +69,7 @@ class Translator
             if ($options->isMultiline() !== null) $data["multiline"] = $options->isMultiline();
             if ($options->getAdaptTo() !== null) $data["adapt_to"] = $options->getAdaptTo();
             if ($options->getInstructions() !== null) $data["instructions"] = $options->getInstructions();
+            if ($options->getGlossaries() !== null) $data["glossaries"] = $options->getGlossaries();
             if ($options->getTimeoutInMillis() !== null) $data["timeout"] = $options->getTimeoutInMillis();
             if ($options->getPriority() !== null) $data["priority"] = $options->getPriority();
             if ($options->getUseCache() !== null) $data["use_cache"] = $options->getUseCache();

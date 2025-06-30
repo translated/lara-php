@@ -106,6 +106,8 @@ class Documents
             $documentUploadOptions.setAdaptTo($options->getAdaptTo());
         if ($options->isNoTrace())
             $documentUploadOptions->setNoTrace($options->isNoTrace());
+        if ($options->getGlossaries())
+            $documentUploadOptions->setGlossaries($options->getGlossaries());
 
         $documentDownloadOptions = new DocumentDownloadOptions();
         if ($options->getOutputFormat())

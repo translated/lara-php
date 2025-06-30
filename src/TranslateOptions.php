@@ -7,6 +7,7 @@ class TranslateOptions
     private $sourceHint = null;
     private $adaptTo = null;
     private $instructions = null;
+    private $glossaries = null;
     private $contentType = null;
     private $multiline = null;
     private $timeoutInMillis = null;
@@ -24,6 +25,8 @@ class TranslateOptions
             $this->setAdaptTo($options['adaptTo']);
         if (isset($options['instructions']))
             $this->setInstructions($options['instructions']);
+        if (isset($options['glossaries']))
+            $this->setGlossaries($options['glossaries']);
         if (isset($options['contentType']))
             $this->setContentType($options['contentType']);
         if (isset($options['multiline']))
@@ -88,6 +91,22 @@ class TranslateOptions
     public function getInstructions()
     {
         return $this->instructions;
+    }
+
+    /**
+     * @param $glossaries string[]|null
+     */
+    public function setGlossaries($glossaries)
+    {
+        $this->glossaries = $glossaries;
+    }
+
+    /**
+     * @return string[]|null
+     */
+    public function getGlossaries()
+    {
+        return $this->glossaries;
     }
 
     /**

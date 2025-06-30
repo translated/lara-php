@@ -175,10 +175,13 @@ class HttpClient
         }
 
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-        $json = json_decode($result, true);
+        $contentType = curl_getinfo($this->curl, CURLINFO_CONTENT_TYPE);
+        $json = !str_starts_with($contentType, "text/csv") ? json_decode($result, true) : null;
 
         if (200 <= $statusCode && $statusCode < 300) {
-            return $json && isset($json['content']) ? $json['content'] : null;
+            return str_starts_with($contentType, "text/csv")
+                ? $result
+                : ($json && isset($json['content']) ? $json['content'] : null);
         } else {
             $error = $json && isset($json['error']) ? $json['error'] : [];
             throw new LaraApiException(
