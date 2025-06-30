@@ -67,6 +67,7 @@ class Translator
             if ($options->getPriority() !== null) $data["priority"] = $options->getPriority();
             if ($options->getUseCache() !== null) $data["use_cache"] = $options->getUseCache();
             if ($options->getCacheTTLSeconds() !== null) $data["cache_ttl"] = $options->getCacheTTLSeconds();
+            if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
 
             if ($options->isNoTrace() !== null) $headers["X-No-Trace"] = "true";
         }

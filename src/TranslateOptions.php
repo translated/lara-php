@@ -14,6 +14,7 @@ class TranslateOptions
     private $useCache = null;
     private $cacheTTLSeconds = null;
     private $noTrace = null;
+    private $verbose = null;
 
     public function __construct($options = [])
     {
@@ -37,6 +38,8 @@ class TranslateOptions
             $this->setCacheTTLSeconds($options['cacheTTLSeconds']);
         if (isset($options['noTrace']))
             $this->setNoTrace($options['noTrace']);
+        if (isset($options['verbose']))
+            $this->setVerbose($options['verbose']);
     }
 
     /**
@@ -199,4 +202,17 @@ class TranslateOptions
         return $this->noTrace;
     }
 
+    /**
+     * @param $verbose bool|null
+     */
+    public function setVerbose($verbose) {
+        $this->verbose = $verbose;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isVerbose() {
+        return $this->verbose;
+    }
 }
