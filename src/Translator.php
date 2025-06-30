@@ -7,7 +7,7 @@ class Translator
     /**
      * @var Internal\HttpClient
      */
-    private $client;
+    protected $client;
 
     /**
      * @var Memories
