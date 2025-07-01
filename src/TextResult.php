@@ -25,7 +25,9 @@ class TextResult implements \JsonSerializable
             $response["content_type"],
             $response["source_language"],
             $translation,
-            isset($response["adapted_to"]) ? $response["adapted_to"] : null
+            isset($response["adapted_to"]) ? $response["adapted_to"] : null,
+            isset($response["adapted_to_matches"]) ? $response["adapted_to_matches"] : null,
+            isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null
         );
     }
 
@@ -33,19 +35,25 @@ class TextResult implements \JsonSerializable
     private $sourceLanguage;
     private $translation;
     private $adaptedTo;
+    private $adaptedToMatches;
+    private $glossariesMatches;
 
     /**
      * @param $contentType string
      * @param $sourceLanguage string
      * @param $translation string|string[]|TextBlock[]
      * @param $adaptedTo string[]|null
+     * @param $adaptedToMatches NGMemoryMatch[]|NGMemoryMatch[][]|null
+     * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
      */
-    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null)
+    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $adaptedToMatches = null, $glossariesMatches = null)
     {
         $this->contentType = $contentType;
         $this->sourceLanguage = $sourceLanguage;
         $this->translation = $translation;
         $this->adaptedTo = $adaptedTo;
+        $this->adaptedToMatches = $adaptedToMatches;
+        $this->glossariesMatches = $glossariesMatches;
     }
 
     /**
@@ -79,6 +87,23 @@ class TextResult implements \JsonSerializable
     {
         return $this->adaptedTo;
     }
+
+    /**
+     * @return NGMemoryMatch[]|NGMemoryMatch[][]|null
+     */
+    public function getAdaptedToMatches()
+    {
+        return $this->adaptedToMatches;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function getGlossariesMatches()
+    {
+        return $this->glossariesMatches;
+    }
+
 
     // Compatibility layer for PHP 8.1+
     #[\ReturnTypeWillChange]
