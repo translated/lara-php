@@ -12,21 +12,21 @@ class NGGlossaryMatch
     public static function fromResponse($response)
     {
         return new NGGlossaryMatch(
-            $response['memory'],
+            $response['glossary'],
             $response['language'],
             $response['term'],
             $response['translation']
         );
     }
 
-    private $memory;
+    private $glossary;
     private $language;
     private $term;
     private $translation;
 
-    public function __construct($memory, $language, $term, $translation)
+    public function __construct($glossary, $language, $term, $translation)
     {
-        $this->memory = $memory;
+        $this->glossary = $glossary;
         $this->language = $language;
         $this->term = $term;
         $this->translation = $translation;
@@ -35,9 +35,9 @@ class NGGlossaryMatch
     /**
      * @return string
      */
-    public function getMemory()
+    public function getGlossary()
     {
-        return $this->memory;
+        return $this->glossary;
     }
 
     /**
