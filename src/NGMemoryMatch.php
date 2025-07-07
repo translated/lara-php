@@ -14,8 +14,7 @@ class NGMemoryMatch
         return new NGMemoryMatch(
             $response['memory'],
             isset($response['tuid']) ? $response['tuid'] : null,
-            $response['source'],
-            $response['target'],
+            $response['language'],
             $response['sentence'],
             $response['translation'],
             $response['score']
@@ -24,18 +23,16 @@ class NGMemoryMatch
 
     private $memory;
     private $tuid;
-    private $source;
-    private $target;
+    private $language;
     private $sentence;
     private $translation;
     private $score;
 
-    public function __construct($memory, $tuid, $source, $target, $sentence, $translation, $score)
+    public function __construct($memory, $tuid, $language, $sentence, $translation, $score)
     {
         $this->memory = $memory;
         $this->tuid = $tuid;
-        $this->source = $source;
-        $this->target = $target;
+        $this->language = $language;
         $this->sentence = $sentence;
         $this->translation = $translation;
         $this->score = $score;
@@ -58,19 +55,11 @@ class NGMemoryMatch
     }
 
     /**
-     * @return string
+     * @return string[]
      */
-    public function getSource()
+    public function getLanguage()
     {
-        return $this->source;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTarget()
-    {
-        return $this->target;
+        return $this->language;
     }
 
     /**
