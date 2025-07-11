@@ -76,6 +76,12 @@ class Translator
             if ($options->getCacheTTLSeconds() !== null) $data["cache_ttl"] = $options->getCacheTTLSeconds();
             if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
 
+            if ($options->getHeaders() !== null) {
+                foreach ($options->getHeaders() as $name => $value) {
+                    $headers[$name] = $value;
+                }
+            }
+
             if ($options->isNoTrace() !== null) $headers["X-No-Trace"] = "true";
         }
 

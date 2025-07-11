@@ -16,6 +16,7 @@ class TranslateOptions
     private $cacheTTLSeconds = null;
     private $noTrace = null;
     private $verbose = null;
+    private $headers = null;
 
     public function __construct($options = [])
     {
@@ -43,6 +44,9 @@ class TranslateOptions
             $this->setNoTrace($options['noTrace']);
         if (isset($options['verbose']))
             $this->setVerbose($options['verbose']);
+        if (isset($options['headers']))
+            $this->setHeaders($options['headers']);
+
     }
 
     /**
@@ -233,5 +237,19 @@ class TranslateOptions
      */
     public function isVerbose() {
         return $this->verbose;
+    }
+
+    /**
+     * @param $headers array|null
+     */
+    public function setHeaders($headers) {
+        $this->headers = $headers;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getHeaders() {
+        return $this->headers;
     }
 }
