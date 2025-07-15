@@ -7,6 +7,7 @@ class DocumentUploadOptions
     private $adaptTo = null;
     private $noTrace = null;
     private $glossaries = null;
+    private $style = null;
 
     public function __construct($options = [])
     {
@@ -16,6 +17,8 @@ class DocumentUploadOptions
             $this->setNoTrace($options['noTrace']);
         if (isset($options['glossaries']))
             $this->setGlossaries($options['glossaries']);
+        if (isset($options['style']))
+            $this->setStyle($options['style']);
     }
 
     /**
@@ -67,6 +70,22 @@ class DocumentUploadOptions
     }
 
     /**
+     * @param $style string|null
+     */
+    public function setStyle($style)
+    {
+        $this->style = $style;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    /**
      * @return array
      */
     public function toParams() {
@@ -76,6 +95,9 @@ class DocumentUploadOptions
         }
         if ($this->glossaries) {
             $params['glossaries'] = $this->glossaries;
+        }
+        if ($this->style) {
+            $params['style'] = $this->style;
         }
         return $params;
     }

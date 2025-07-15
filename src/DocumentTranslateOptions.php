@@ -8,6 +8,7 @@ class DocumentTranslateOptions
     private $outputFormat = null;
     private $noTrace = null;
     private $glossaries = null;
+    private $style = null;
 
     public function __construct($options = [])
     {
@@ -19,6 +20,8 @@ class DocumentTranslateOptions
             $this->setNoTrace($options['noTrace']);
         if (isset($options['glossaries']))
             $this->setGlossaries($options['glossaries']);
+        if (isset($options['style']))
+            $this->setStyle($options['style']);
     }
 
     /**
@@ -86,6 +89,22 @@ class DocumentTranslateOptions
     }
 
     /**
+     * @param $style string|null
+     */
+    public function setStyle($style)
+    {
+        $this->style = $style;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    /**
      * @return array
      */
     public function toParams() {
@@ -98,6 +117,9 @@ class DocumentTranslateOptions
         }
         if ($this->glossaries) {
             $params['glossaries'] = $this->glossaries;
+        }
+        if ($this->style) {
+            $params['style'] = $this->style;
         }
         return $params;
     }

@@ -108,6 +108,8 @@ class Documents
             $documentUploadOptions->setNoTrace($options->isNoTrace());
         if ($options->getGlossaries())
             $documentUploadOptions->setGlossaries($options->getGlossaries());
+        if ($options->getStyle())
+            $documentUploadOptions->setStyle($options->getStyle());
 
         $documentDownloadOptions = new DocumentDownloadOptions();
         if ($options->getOutputFormat())

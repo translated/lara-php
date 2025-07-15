@@ -75,6 +75,7 @@ class Translator
             if ($options->getUseCache() !== null) $data["use_cache"] = $options->getUseCache();
             if ($options->getCacheTTLSeconds() !== null) $data["cache_ttl"] = $options->getCacheTTLSeconds();
             if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
+            if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
 
             if ($options->getHeaders() !== null) {
                 foreach ($options->getHeaders() as $name => $value) {
