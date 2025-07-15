@@ -26,6 +26,7 @@ class TextResult implements \JsonSerializable
             $response["source_language"],
             $translation,
             isset($response["adapted_to"]) ? $response["adapted_to"] : null,
+            isset($response["glossaries"]) ? $response["glossaries"] : null,
             isset($response["adapted_to_matches"]) ? $response["adapted_to_matches"] : null,
             isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null
         );
@@ -35,6 +36,7 @@ class TextResult implements \JsonSerializable
     private $sourceLanguage;
     private $translation;
     private $adaptedTo;
+    private $glossaries;
     private $adaptedToMatches;
     private $glossariesMatches;
 
@@ -43,15 +45,17 @@ class TextResult implements \JsonSerializable
      * @param $sourceLanguage string
      * @param $translation string|string[]|TextBlock[]
      * @param $adaptedTo string[]|null
+     * @param $glossaries string[]|null
      * @param $adaptedToMatches NGMemoryMatch[]|NGMemoryMatch[][]|null
      * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
      */
-    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $adaptedToMatches = null, $glossariesMatches = null)
+    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null)
     {
         $this->contentType = $contentType;
         $this->sourceLanguage = $sourceLanguage;
         $this->translation = $translation;
         $this->adaptedTo = $adaptedTo;
+        $this->glossaries = $glossaries;
         $this->adaptedToMatches = $adaptedToMatches;
         $this->glossariesMatches = $glossariesMatches;
     }
@@ -86,6 +90,14 @@ class TextResult implements \JsonSerializable
     public function getAdaptedTo()
     {
         return $this->adaptedTo;
+    }
+
+    /**
+     * @return string[]|null
+     */
+    public function getGlossaries()
+    {
+        return $this->glossaries;
     }
 
     /**
