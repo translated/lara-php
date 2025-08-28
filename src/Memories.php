@@ -131,11 +131,12 @@ class Memories
      * @param $tuid string|null
      * @param $sentenceBefore string|null
      * @param $sentenceAfter string|null
+     * @param $headers array|null
      * @return MemoryImport
      * @throws LaraException
      */
     public function addTranslation($id, $source, $target, $sentence, $translation,
-                                   $tuid = null, $sentenceBefore = null, $sentenceAfter = null)
+                                   $tuid = null, $sentenceBefore = null, $sentenceAfter = null, $headers = null)
     {
         $body = [
             'source' => $source,
@@ -149,9 +150,9 @@ class Memories
 
         if (is_array($id)) {
             $body['ids'] = $id;
-            return MemoryImport::fromResponse($this->client->put("/memories/content", $body));
+            return MemoryImport::fromResponse($this->client->put("/memories/content", $body, null, $headers));
         } else {
-            return MemoryImport::fromResponse($this->client->put("/memories/$id/content", $body));
+            return MemoryImport::fromResponse($this->client->put("/memories/$id/content", $body, null, $headers));
         }
     }
 
