@@ -9,6 +9,8 @@ class DocumentTranslateOptions
     private $noTrace = null;
     private $glossaries = null;
     private $style = null;
+    private $password = null;
+    private $extractionParameters = null;
 
     public function __construct($options = [])
     {
@@ -22,6 +24,10 @@ class DocumentTranslateOptions
             $this->setGlossaries($options['glossaries']);
         if (isset($options['style']))
             $this->setStyle($options['style']);
+        if (isset($options['password']))
+            $this->setPassword($options['password']);
+        if (isset($options['extractionParameters']))
+            $this->setExtractionParameters($options['extractionParameters']);
     }
 
     /**
@@ -105,6 +111,38 @@ class DocumentTranslateOptions
     }
 
     /**
+     * @param $password string|null
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+  
+    /**
+     * @param $extractionParameters DocumentExtractionParams|null
+     */
+    public function setExtractionParameters($extractionParameters)
+    {
+        $this->extractionParameters = $extractionParameters;
+    }
+
+    /**
+     * @return DocumentExtractionParams|null
+     */
+    public function getExtractionParameters()
+    {
+        return $this->extractionParameters;
+    }
+
+    /**
      * @return array
      */
     public function toParams() {
@@ -120,6 +158,12 @@ class DocumentTranslateOptions
         }
         if ($this->style) {
             $params['style'] = $this->style;
+        }
+        if ($this->password) {
+            $params['password'] = $this->password;
+        }
+        if ($this->extractionParameters) {
+            $params['extraction_params'] = $this->extractionParameters->toParams();
         }
         return $params;
     }

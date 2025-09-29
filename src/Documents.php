@@ -110,6 +110,10 @@ class Documents
             $documentUploadOptions->setGlossaries($options->getGlossaries());
         if ($options->getStyle())
             $documentUploadOptions->setStyle($options->getStyle());
+        if ($options->getPassword())
+            $documentUploadOptions->setPassword($options->getPassword());
+        if ($options->getExtractionParameters())
+            $documentUploadOptions->setExtractionParameters($options->getExtractionParameters());
 
         $documentDownloadOptions = new DocumentDownloadOptions();
         if ($options->getOutputFormat())
