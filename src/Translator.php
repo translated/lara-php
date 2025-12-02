@@ -90,4 +90,20 @@ class Translator
         return TextResult::fromResponse($this->client->post("/translate", $data, null, $headers));
     }
 
+    /**
+     * @param $text string
+     * @param $hint string|null
+     * @param $passlist string[]|null
+     * @return DetectResult
+     * @throws LaraException
+     */
+    public function detect($text, $hint = null, $passlist = null)
+    {
+        $data = ["q" => $text];
+        if ($hint) $data["hint"] = $hint;
+        if ($passlist) $data["passlist"] = $passlist;
+
+        return DetectResult::fromResponse($this->client->post("/detect", $data));
+    }
+
 }

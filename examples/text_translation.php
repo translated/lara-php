@@ -136,6 +136,26 @@ function main() {
         echo "Error getting languages: " . $e->getMessage() . "\n";
         return;
     }
+
+    // Example 8: Detect language of a given text
+    echo "=== Detect language ===\n";
+    try {
+        $detect_result_1 = $lara->detect("Hello, world!");
+        echo "Detected language for 'Hello, world!': " . $detect_result_1->getLanguage() . "\n";
+    } catch (LaraException $e) {
+        echo "Error detecting language: " . $e->getMessage() . "\n";
+        return;
+    }
+
+    // Example 9: Detect language of a given text with hint and passlist
+    echo "=== Detect language with hint and passlist ===\n";
+    try {
+        $detect_result_2 = $lara->detect("Hello, world!", "en", ["en", "fr"]);
+        echo "Detected language for 'Hello, world!': " . $detect_result_2->getLanguage() . "\n";
+    } catch (LaraException $e) {
+        echo "Error detecting language: " . $e->getMessage() . "\n";
+        return;
+    }
 }
 
 main();
