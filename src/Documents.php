@@ -103,7 +103,7 @@ class Documents
     {
         $documentUploadOptions = new DocumentUploadOptions();
         if ($options->getAdaptTo())
-            $documentUploadOptions.setAdaptTo($options->getAdaptTo());
+            $documentUploadOptions->setAdaptTo($options->getAdaptTo());
         if ($options->isNoTrace())
             $documentUploadOptions->setNoTrace($options->isNoTrace());
         if ($options->getGlossaries())
