@@ -12,7 +12,7 @@
     "license": "MIT",
     "homepage": "https://laratranslate.com/",
     "require": {
-        "php": ">=5.6.0",
+        "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*"
     },
