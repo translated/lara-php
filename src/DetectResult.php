@@ -12,21 +12,25 @@ class DetectResult implements \JsonSerializable
     {
         return new DetectResult(
             $response["language"],
-            $response["content_type"]
+            $response["content_type"],
+            $response["predictions"] ?? []
         );
     }
 
     private $language;
     private $contentType;
+    private $predictions;
 
     /**
      * @param $language string
      * @param $contentType string
+     * @param $predictions array Array of predictions with 'language' and 'confidence' keys
      */
-    public function __construct($language, $contentType)
+    public function __construct($language, $contentType, $predictions = [])
     {
         $this->language = $language;
         $this->contentType = $contentType;
+        $this->predictions = $predictions;
     }
 
     /**
@@ -42,6 +46,14 @@ class DetectResult implements \JsonSerializable
     public function getContentType()
     {
         return $this->contentType;
+    }
+
+    /**
+     * @return array Array of predictions with 'language' and 'confidence' keys
+     */
+    public function getPredictions()
+    {
+        return $this->predictions;
     }
 
     #[\ReturnTypeWillChange]

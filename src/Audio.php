@@ -2,14 +2,14 @@
 
 namespace Lara;
 
-class Document
+class Audio
 {
     /**
      * @param $response array
-     * @return Document
+     * @return Audio
      */
     public static function fromResponse($response) {
-        return new Document(
+        return new Audio(
             $response['id'],
             $response['status'],
             isset($response['source']) ? $response['source'] : null,
@@ -17,9 +17,10 @@ class Document
             $response['filename'],
             $response['created_at'],
             $response['updated_at'],
-            isset($response['translated_chars']) ? $response['translated_chars'] : null,
-            isset($response['total_chars']) ? $response['total_chars'] : null,
-            isset($response['error_reason']) ? $response['error_reason'] : null
+            isset($response['error_reason']) ? $response['error_reason'] : null,
+            isset($response['options']) ? $response['options'] : null,
+            isset($response['translated_seconds']) ? $response['translated_seconds'] : null,
+            isset($response['total_seconds']) ? $response['total_seconds'] : null
         );
     }
 
@@ -30,11 +31,12 @@ class Document
     private $filename;
     private $createdAt;
     private $updatedAt;
-    private $translatedChars;
-    private $totalChars;
     private $errorReason;
+    private $options;
+    private $translatedSeconds;
+    private $totalSeconds;
 
-    public function __construct($id, $status, $source, $target, $filename, $createdAt, $updatedAt, $translatedChars, $totalChars, $errorReason) {
+    public function __construct($id, $status, $source, $target, $filename, $createdAt, $updatedAt, $errorReason, $options = null, $translatedSeconds = null, $totalSeconds = null) {
         $this->id = $id;
         $this->status = $status;
         $this->source = $source;
@@ -42,9 +44,10 @@ class Document
         $this->filename = $filename;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
-        $this->translatedChars = $translatedChars;
-        $this->totalChars = $totalChars;
         $this->errorReason = $errorReason;
+        $this->options = $options;
+        $this->translatedSeconds = $translatedSeconds;
+        $this->totalSeconds = $totalSeconds;
     }
 
     /**
@@ -91,24 +94,31 @@ class Document
     }
 
     /**
-     * @return int
-     */
-    public function getTranslatedChars() {
-        return $this->translatedChars;
-    }
-
-    /**
-     * @return int
-     */
-    public function getTotalChars() {
-        return $this->totalChars;
-    }
-
-    /**
      * @return string
      */
     public function getErrorReason() {
         return $this->errorReason;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTranslatedSeconds() {
+        return $this->translatedSeconds;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTotalSeconds() {
+        return $this->totalSeconds;
     }
 
     /**

@@ -25,18 +25,55 @@ class Translator
     public $glossaries;
 
     /**
-     * @param $credentials LaraCredentials
-     * @param $options TranslatorOptions | null
+     * @var ImageTranslator
      */
-    public function __construct($credentials, $options = null)
+    public $images;
+
+    /**
+     * @var AudioTranslator
+     */
+    public $audio;
+
+    /**
+     * @param $auth AccessKey|AuthToken
+     * @param $options TranslatorOptions | null
+     * @throws LaraException
+     */
+    public function __construct($auth, $options = null)
     {
         $serverUrl = $options ? $options->getServerUrl() : null;
         $serverUrl = $serverUrl ?: 'https://api.laratranslate.com';
 
-        $this->client = new Internal\HttpClient($serverUrl, $credentials->getAccessKeyId(), $credentials->getAccessKeySecret());
+        $this->client = new Internal\HttpClient($serverUrl, $auth);
+
         $this->memories = new Memories($this->client);
         $this->documents = new Documents($this->client);
         $this->glossaries = new Glossaries($this->client);
+        $this->audio = new AudioTranslator($this->client);
+        $this->images = new ImageTranslator($this->client);
+    }
+
+    /**
+     * Gets the HTTP client instance for advanced configuration (e.g., setting logger or extra headers)
+     * @return Internal\HttpClient
+     */
+    public function getHttpClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param $options TranslatorOptions | null
+     * @return string Login page URL
+     */
+    public static function getLoginUrl($options = null)
+    {
+        $serverUrl = $options ? $options->getServerUrl() : 'https://api.laratranslate.com';
+        $ch = curl_init($serverUrl . '/v2/auth/login-page');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        return $result;
     }
 
     /**
@@ -45,7 +82,7 @@ class Translator
      */
     public function getLanguages()
     {
-        return $this->client->get("/languages");
+        return $this->client->get("/v2/languages");
     }
 
     /**
@@ -53,10 +90,11 @@ class Translator
      * @param $source string|null
      * @param $target string
      * @param $options TranslateOptions | null
+     * @param $callback callable|null Callback for streaming partial results (result) => void
      * @return TextResult
      * @throws LaraException
      */
-    public function translate($text, $source, $target, $options = null)
+    public function translate($text, $source, $target, $options = null, $callback = null)
     {
         $data = ["q" => $text, "target" => $target];
         $headers = [];
@@ -76,6 +114,7 @@ class Translator
             if ($options->getCacheTTLSeconds() !== null) $data["cache_ttl"] = $options->getCacheTTLSeconds();
             if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
             if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
+            if ($options->isReasoning() !== null) $data["reasoning"] = $options->isReasoning();
 
             if ($options->getHeaders() !== null) {
                 foreach ($options->getHeaders() as $name => $value) {
@@ -86,8 +125,14 @@ class Translator
             if ($options->isNoTrace() !== null) $headers["X-No-Trace"] = "true";
         }
 
+        $wrappedCallback = null;
+        if ($callback !== null) {
+            $wrappedCallback = function ($chunk) use ($callback) {
+                call_user_func($callback, TextResult::fromResponse($chunk));
+            };
+        }
 
-        return TextResult::fromResponse($this->client->post("/translate", $data, null, $headers));
+        return TextResult::fromResponse($this->client->postStream("/translate", $data, null, $headers, $wrappedCallback));
     }
 
     /**
@@ -103,7 +148,7 @@ class Translator
         if ($hint) $data["hint"] = $hint;
         if ($passlist) $data["passlist"] = $passlist;
 
-        return DetectResult::fromResponse($this->client->post("/detect", $data));
+        return DetectResult::fromResponse($this->client->post("/v2/detect", $data));
     }
 
 }

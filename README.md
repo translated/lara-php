@@ -10,6 +10,7 @@ All major translation features are accessible, making it easy to integrate and c
 ## 🌍 **Features:**
 - **Text Translation**: Single strings, multiple strings, and complex text blocks
 - **Document Translation**: Word, PDF, and other document formats with status monitoring
+- **Image Translation**: Translate whole images or extract and translate text blocks
 - **Translation Memory**: Store and reuse translations for consistency
 - **Glossaries**: Enforce terminology standards across translations
 - **Language Detection**: Automatic source language identification
@@ -90,6 +91,17 @@ php text_translation.php
 ```bash
 cd examples
 php document_translation.php
+```
+
+### Image Translation
+- **[image_translation.php](examples/image_translation.php)** - Image translation examples
+    - Basic image translation
+    - Advanced options with memories and glossaries
+    - Extract and translate text from an image
+
+```bash
+cd examples
+php image_translation.php
 ```
 
 ### Translation Memory Management
@@ -216,6 +228,25 @@ $status = $lara->documents->status($document->getId());
 $downloadOptions = new DocumentDownloadOptions();
 
 $fileStream = $lara->documents->download($document->getId(), $downloadOptions);
+```
+
+### 🖼️ Image Translation
+
+```php
+use Lara\ImageTranslationOptions;
+use Lara\ImageTextTranslationOptions;
+
+// Translate image and receive a translated image stream
+$translatedImageStream = $lara->images->translate("/path/to/your/image.png", "en", "fr", new ImageTranslationOptions([
+    'textRemoval' => 'inpainting',
+    'style' => 'faithful'
+]));
+
+// Extract and translate text blocks from an image
+$textBlocks = $lara->images->translateText("/path/to/your/image.png", "en", "fr", new ImageTextTranslationOptions([
+    'adaptTo' => ["mem_1A2b3C4d5E6f7G8h9I0jKl"],
+    'glossaries' => ["gls_1A2b3C4d5E6f7G8h9I0jKl"],
+]));
 ```
 
 ### 🧠 Memory Management

@@ -18,6 +18,7 @@ class TranslateOptions
     private $verbose = null;
     private $style = null;
     private $headers = null;
+    private $reasoning = null;
 
     public function __construct($options = [])
     {
@@ -49,6 +50,8 @@ class TranslateOptions
             $this->setStyle($options['style']);
         if (isset($options['headers']))
             $this->setHeaders($options['headers']);
+        if (isset($options['reasoning']))
+            $this->setReasoning($options['reasoning']);
 
     }
 
@@ -270,5 +273,21 @@ class TranslateOptions
      */
     public function getHeaders() {
         return $this->headers;
+    }
+
+    /**
+     * @param $reasoning bool|null
+     */
+    public function setReasoning($reasoning)
+    {
+        $this->reasoning = $reasoning;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isReasoning()
+    {
+        return $this->reasoning;
     }
 }

@@ -36,7 +36,7 @@ class Documents
     {
         $filename = basename($filepath);
 
-        $s3Upload = S3UploadParams::fromResponse($this->client->get('/documents/upload-url', ['filename' => $filename]));
+        $s3Upload = S3UploadParams::fromResponse($this->client->get('/v2/documents/upload-url', ['filename' => $filename]));
         $this->s3Client->upload($s3Upload->getUrl(), $s3Upload->getFields(), $filepath);
 
         $data = [
@@ -56,7 +56,7 @@ class Documents
             }
         }
 
-        return Document::fromResponse($this->client->post("/documents", $data, null, $headers));
+        return Document::fromResponse($this->client->post("/v2/documents", $data, null, $headers));
     }
 
     /**
@@ -66,7 +66,7 @@ class Documents
      */
     public function status($documentId)
     {
-        return Document::fromResponse($this->client->get("/documents/$documentId"));
+        return Document::fromResponse($this->client->get("/v2/documents/$documentId"));
     }
 
     /**
@@ -85,7 +85,7 @@ class Documents
             }
         }
 
-        $s3Url = S3DownloadParams::fromResponse($this->client->get("/documents/$documentId/download-url", $data));
+        $s3Url = S3DownloadParams::fromResponse($this->client->get("/v2/documents/$documentId/download-url", $data));
 
         return $this->s3Client->download($s3Url->getUrl());
     }
@@ -102,22 +102,26 @@ class Documents
     public function translate($filepath, $source, $target, $options = null)
     {
         $documentUploadOptions = new DocumentUploadOptions();
-        if ($options->getAdaptTo())
-            $documentUploadOptions.setAdaptTo($options->getAdaptTo());
-        if ($options->isNoTrace())
-            $documentUploadOptions->setNoTrace($options->isNoTrace());
-        if ($options->getGlossaries())
-            $documentUploadOptions->setGlossaries($options->getGlossaries());
-        if ($options->getStyle())
-            $documentUploadOptions->setStyle($options->getStyle());
-        if ($options->getPassword())
-            $documentUploadOptions->setPassword($options->getPassword());
-        if ($options->getExtractionParameters())
-            $documentUploadOptions->setExtractionParameters($options->getExtractionParameters());
+        if ($options !== null) {
+            if ($options->getAdaptTo())
+                $documentUploadOptions->setAdaptTo($options->getAdaptTo());
+            if ($options->isNoTrace())
+                $documentUploadOptions->setNoTrace($options->isNoTrace());
+            if ($options->getGlossaries())
+                $documentUploadOptions->setGlossaries($options->getGlossaries());
+            if ($options->getStyle())
+                $documentUploadOptions->setStyle($options->getStyle());
+            if ($options->getPassword())
+                $documentUploadOptions->setPassword($options->getPassword());
+            if ($options->getExtractionParameters())
+                $documentUploadOptions->setExtractionParameters($options->getExtractionParameters());
+        }
 
         $documentDownloadOptions = new DocumentDownloadOptions();
-        if ($options->getOutputFormat())
-            $documentDownloadOptions->setOutputFormat($options->getOutputFormat());
+        if ($options !== null) {
+            if ($options->getOutputFormat())
+                $documentDownloadOptions->setOutputFormat($options->getOutputFormat());
+        }
 
         $document = $this->upload($filepath, $source, $target, $documentUploadOptions);
 

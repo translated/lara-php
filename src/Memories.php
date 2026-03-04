@@ -16,6 +16,7 @@ class Memories
     }
 
     /**
+     * Get all memories
      * @return Memory[]
      * @throws LaraException
      */
@@ -23,7 +24,7 @@ class Memories
     {
         return array_map(function ($e) {
             return Memory::fromResponse($e);
-        }, $this->client->get("/memories"));
+        }, $this->client->get("/v2/memories"));
     }
 
     /**
@@ -34,7 +35,7 @@ class Memories
      */
     public function create($name, $external_id = null)
     {
-        return Memory::fromResponse($this->client->post("/memories", [
+        return Memory::fromResponse($this->client->post("/v2/memories", [
             'name' => $name,
             'external_id' => $external_id
         ]));
@@ -48,7 +49,7 @@ class Memories
     public function get($id)
     {
         try {
-            return Memory::fromResponse($this->client->get("/memories/$id"));
+            return Memory::fromResponse($this->client->get("/v2/memories/$id"));
         } catch (LaraApiException $e) {
             if ($e->getCode() == 404) return null;
             throw $e;
@@ -62,7 +63,7 @@ class Memories
      */
     public function delete($id)
     {
-        return Memory::fromResponse($this->client->delete("/memories/$id"));
+        return Memory::fromResponse($this->client->delete("/v2/memories/$id"));
     }
 
     /**
@@ -73,7 +74,7 @@ class Memories
      */
     public function update($id, $name)
     {
-        return Memory::fromResponse($this->client->put("/memories/$id", [
+        return Memory::fromResponse($this->client->put("/v2/memories/$id", [
             'name' => $name,
         ]));
     }
@@ -89,8 +90,8 @@ class Memories
 
         $memories = array_map(function ($e) {
             return Memory::fromResponse($e);
-        }, $this->client->post("/memories/connect", [
-            'ids' => $ids
+        }, $this->client->post("/v2/memories/connect", [
+            'ids' => $isArray ? $ids : [$ids]
         ]));
 
         return $isArray ? $memories : $memories[0];
@@ -105,7 +106,7 @@ class Memories
      */
     public function importTmx($id, $tmx, $gzip = false)
     {
-        return MemoryImport::fromResponse($this->client->post("/memories/$id/import", [
+        return MemoryImport::fromResponse($this->client->post("/v2/memories/$id/import", [
             'compression' => $gzip ? 'gzip' : null
         ], [
             'tmx' => $tmx
@@ -119,7 +120,7 @@ class Memories
      */
     public function getImportStatus($id)
     {
-        return MemoryImport::fromResponse($this->client->get("/memories/imports/$id"));
+        return MemoryImport::fromResponse($this->client->get("/v2/memories/imports/$id"));
     }
 
     /**
@@ -150,9 +151,9 @@ class Memories
 
         if (is_array($id)) {
             $body['ids'] = $id;
-            return MemoryImport::fromResponse($this->client->put("/memories/content", $body, null, $headers));
+            return MemoryImport::fromResponse($this->client->put("/v2/memories/content", $body, null, $headers));
         } else {
-            return MemoryImport::fromResponse($this->client->put("/memories/$id/content", $body, null, $headers));
+            return MemoryImport::fromResponse($this->client->put("/v2/memories/$id/content", $body, null, $headers));
         }
     }
 
@@ -183,9 +184,9 @@ class Memories
 
         if (is_array($id)) {
             $body['ids'] = $id;
-            return MemoryImport::fromResponse($this->client->delete("/memories/content", $body));
+            return MemoryImport::fromResponse($this->client->delete("/v2/memories/content", $body));
         } else {
-            return MemoryImport::fromResponse($this->client->delete("/memories/$id/content", $body));
+            return MemoryImport::fromResponse($this->client->delete("/v2/memories/$id/content", $body));
         }
     }
 

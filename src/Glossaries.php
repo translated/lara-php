@@ -17,6 +17,7 @@ class Glossaries
 
 
     /**
+     * Get all glossaries
      * @return Glossary[]
      * @throws LaraException
      */
@@ -24,7 +25,7 @@ class Glossaries
     {
         return array_map(function ($e) {
             return Glossary::fromResponse($e);
-        }, $this->client->get("/glossaries"));
+        }, $this->client->get("/v2/glossaries"));
     }
 
     /**
@@ -34,7 +35,7 @@ class Glossaries
      */
     public function create($name)
     {
-        return Glossary::fromResponse($this->client->post("/glossaries", [
+        return Glossary::fromResponse($this->client->post("/v2/glossaries", [
             'name' => $name
         ]));
     }
@@ -47,7 +48,7 @@ class Glossaries
     public function get($id)
     {
         try {
-            return Glossary::fromResponse($this->client->get("/glossaries/$id"));
+            return Glossary::fromResponse($this->client->get("/v2/glossaries/$id"));
         } catch (LaraApiException $e) {
             if ($e->getCode() == 404) return null;
             throw $e;
@@ -61,7 +62,7 @@ class Glossaries
      */
     public function delete($id)
     {
-        return Glossary::fromResponse($this->client->delete("/glossaries/$id"));
+        return Glossary::fromResponse($this->client->delete("/v2/glossaries/$id"));
     }
 
     /**
@@ -72,7 +73,7 @@ class Glossaries
      */
     public function update($id, $name)
     {
-        return Glossary::fromResponse($this->client->put("/glossaries/$id", [
+        return Glossary::fromResponse($this->client->put("/v2/glossaries/$id", [
             'name' => $name,
         ]));
     }
@@ -86,8 +87,22 @@ class Glossaries
      */
     public function importCsv($id, $csv, $gzip = false)
     {
-        return GlossaryImport::fromResponse($this->client->post("/glossaries/$id/import", [
-            'compression' => $gzip ? 'gzip' : null
+        return $this->importCsvWithContentType($id, $csv, GlossaryFileFormat::CSV_TABLE_UNI, $gzip);
+    }
+
+    /**
+     * @param $id string
+     * @param $csv string
+     * @param $contentType string
+     * @param $gzip bool
+     * @return GlossaryImport
+     * @throws LaraException
+     */
+    public function importCsvWithContentType($id, $csv, $contentType, $gzip = false)
+    {
+        return GlossaryImport::fromResponse($this->client->post("/v2/glossaries/$id/import", [
+            'compression' => $gzip ? 'gzip' : null,
+            'content_type' => $contentType
         ], [
             'csv' => $csv
         ]));
@@ -100,7 +115,7 @@ class Glossaries
      */
     public function getImportStatus($id)
     {
-        return GlossaryImport::fromResponse($this->client->get("/glossaries/imports/$id"));
+        return GlossaryImport::fromResponse($this->client->get("/v2/glossaries/imports/$id"));
     }
 
     /**
@@ -130,21 +145,56 @@ class Glossaries
      */
     public function counts($id)
     {
-        return GlossaryCounts::fromResponse($this->client->get("/glossaries/$id/counts"));
+        return GlossaryCounts::fromResponse($this->client->get("/v2/glossaries/$id/counts"));
     }
 
     /**
      * @param $id string
      * @param $contentType string
-     * @param $source string | null
+     * @param $source string|null
      * @return string
      * @throws LaraException
      */
-    public function export($id, $contentType, $source)
+    public function export($id, $contentType, $source = null)
     {
-        return $this->client->get("/glossaries/$id/export", [
+        return $this->client->get("/v2/glossaries/$id/export", [
             'content_type' => $contentType,
             'source' => $source
         ]);
+    }
+
+    /**
+     * @param $id string
+     * @param $terms array<array{language: string, value: string}>
+     * @param $guid string|null
+     * @return GlossaryImport
+     * @throws LaraException
+     */
+    public function addOrReplaceEntry($id, $terms, $guid = null)
+    {
+        $data = ['terms' => $terms];
+        if ($guid !== null) {
+            $data['guid'] = $guid;
+        }
+        return GlossaryImport::fromResponse($this->client->put("/v2/glossaries/$id/content", $data));
+    }
+
+    /**
+     * @param $id string
+     * @param $term array{language: string, value: string}|null
+     * @param $guid string|null
+     * @return GlossaryImport
+     * @throws LaraException
+     */
+    public function deleteEntry($id, $term = null, $guid = null)
+    {
+        $data = [];
+        if ($term !== null) {
+            $data['term'] = $term;
+        }
+        if ($guid !== null) {
+            $data['guid'] = $guid;
+        }
+        return GlossaryImport::fromResponse($this->client->delete("/v2/glossaries/$id/content", $data));
     }
 }
