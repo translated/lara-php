@@ -8,6 +8,7 @@ class AudioTranslateOptions
     private $noTrace = null;
     private $glossaries = null;
     private $style = null;
+    private $voiceGender = null;
     public function __construct($options = [])
     {
         if (isset($options['adaptTo']))
@@ -18,6 +19,8 @@ class AudioTranslateOptions
             $this->setGlossaries($options['glossaries']);
         if (isset($options['style']))
             $this->setStyle($options['style']);
+        if (isset($options['voiceGender']))
+            $this->setVoiceGender($options['voiceGender']);
     }
 
     /**
@@ -85,6 +88,22 @@ class AudioTranslateOptions
     }
 
     /**
+     * @param $voiceGender string|null
+     */
+    public function setVoiceGender($voiceGender)
+    {
+        $this->voiceGender = $voiceGender;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getVoiceGender()
+    {
+        return $this->voiceGender;
+    }
+
+    /**
      * @return array
      */
     public function toParams() {
@@ -97,6 +116,9 @@ class AudioTranslateOptions
         }
         if ($this->style) {
             $params['style'] = $this->style;
+        }
+        if ($this->voiceGender) {
+            $params['voice_gender'] = $this->voiceGender;
         }
         return $params;
     }
