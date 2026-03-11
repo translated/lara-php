@@ -115,6 +115,7 @@ class Translator
             if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
             if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
             if ($options->isReasoning() !== null) $data["reasoning"] = $options->isReasoning();
+            if ($options->getMetadata() !== null) $data["metadata"] = $options->getMetadata();
 
             if ($options->getHeaders() !== null) {
                 foreach ($options->getHeaders() as $name => $value) {

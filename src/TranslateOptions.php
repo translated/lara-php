@@ -19,6 +19,7 @@ class TranslateOptions
     private $style = null;
     private $headers = null;
     private $reasoning = null;
+    private $metadata = null;
 
     public function __construct($options = [])
     {
@@ -52,6 +53,8 @@ class TranslateOptions
             $this->setHeaders($options['headers']);
         if (isset($options['reasoning']))
             $this->setReasoning($options['reasoning']);
+        if (isset($options['metadata']))
+            $this->setMetadata($options['metadata']);
 
     }
 
@@ -289,5 +292,21 @@ class TranslateOptions
     public function isReasoning()
     {
         return $this->reasoning;
+    }
+
+    /**
+     * @param $metadata string|array|null
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * @return string|array|null
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
     }
 }
