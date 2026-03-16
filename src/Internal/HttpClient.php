@@ -19,15 +19,25 @@ class HttpClient
     private $curl;
 
     /**
+     * @var int Timeout in seconds
+     */
+    private $timeout;
+    /**
+     * @var int Connect timeout in seconds
+     */
+    private $connectTimeout;
+
+    /**
      * HttpClient constructor
      * @param string $baseUrl Base API URL
      * @param AccessKey|AuthToken|null $auth Authentication method
      * @throws LaraException
      */
-    public function __construct($baseUrl, $auth = null)
+    public function __construct($baseUrl, $auth = null, $connectTimeout = 3, $timeout = 30)
     {
-        while (substr($baseUrl, -1) == '/')
+        while (substr($baseUrl, -1) == '/') {
             $baseUrl = substr($baseUrl, 0, -1);
+        }
 
         $this->baseUrl = $baseUrl;
 
@@ -39,6 +49,8 @@ class HttpClient
             throw new LaraException('No authentication method provided');
         }
 
+        $this->connectTimeout = $connectTimeout;
+        $this->timeout = $timeout;
         $this->curl = curl_init();
     }
 
@@ -187,26 +199,20 @@ class HttpClient
     }
 
     /**
-     * Makes an authenticated streaming HTTP request with real-time callback execution
-     * @param string $method HTTP method
+     * Build common authenticated request metadata used by both regular and streaming requests.
      * @param string $path Request path
      * @param array|null $body Request body data
-     * @param array|null $files Files to upload
      * @param array|null $headers Additional headers
-     * @param callable|null $callback Callback for each chunk (called immediately as chunks arrive)
-     * @param bool $isRetry Whether this is a retry after token refresh
-     * @return mixed Last result
+     * @return array
      * @throws LaraException
      */
-    private function authenticatedStreamRequest($method, $path, $body = null, $files = null, $headers = null, $callback = null, $isRetry = false)
+    private function prepareAuthenticatedRequest($path, $body = null, $headers = null)
     {
         $token = $this->authenticate();
 
         if ($path[0] !== '/') {
             $path = '/' . $path;
         }
-
-        $url = $this->baseUrl . $path;
 
         $requestHeaders = [
             "X-Lara-Date" => gmdate("D, d M Y H:i:s") . " GMT",
@@ -232,6 +238,34 @@ class HttpClient
                 $body = null;
             }
         }
+
+        return [
+            'path' => $path,
+            'url' => $this->baseUrl . $path,
+            'headers' => $requestHeaders,
+            'body' => $body
+        ];
+    }
+
+    /**
+     * Makes an authenticated streaming HTTP request with real-time callback execution
+     * @param string $method HTTP method
+     * @param string $path Request path
+     * @param array|null $body Request body data
+     * @param array|null $files Files to upload
+     * @param array|null $headers Additional headers
+     * @param callable|null $callback Callback for each chunk (called immediately as chunks arrive)
+     * @param bool $isRetry Whether this is a retry after token refresh
+     * @return mixed Last result
+     * @throws LaraException
+     */
+    private function authenticatedStreamRequest($method, $path, $body = null, $files = null, $headers = null, $callback = null, $isRetry = false)
+    {
+        $requestContext = $this->prepareAuthenticatedRequest($path, $body, $headers);
+        $path = $requestContext['path'];
+        $url = $requestContext['url'];
+        $requestHeaders = $requestContext['headers'];
+        $body = $requestContext['body'];
 
         $requestBody = null;
 
@@ -265,10 +299,9 @@ class HttpClient
         $lastResult = null;
         $hadError = false;
         $errorChunk = null;
-        $self = $this;
 
         // Real-time write function: processes and calls callback immediately
-        $writeFunction = function($ch, $data) use (&$buffer, &$lastResult, &$hadError, &$errorChunk, $callback, $self) {
+        $writeFunction = function($ch, $data) use (&$buffer, &$lastResult, &$hadError, &$errorChunk, $callback) {
             // If we already encountered an error, abort the transfer immediately
             if ($hadError) {
                 return 0; // Returning 0 aborts the CURL transfer
@@ -279,7 +312,7 @@ class HttpClient
             $buffer = array_pop($lines); // Keep incomplete line in buffer
 
             foreach ($lines as $line) {
-                $chunk = $self->parseStreamChunk($line);
+                $chunk = $this->parseStreamChunk($line);
                 if ($chunk === null) {
                     continue;
                 }
@@ -316,6 +349,8 @@ class HttpClient
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
                 return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($requestHeaders), $requestHeaders),
+            CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
+            CURLOPT_TIMEOUT => $this->timeout
         ];
 
         $httpMethod = strtoupper($method);
@@ -406,38 +441,11 @@ class HttpClient
      */
     private function authenticatedRequest($method, $path, $body = null, $files = null, $headers = null, $isRetry = false, $returnStream = false)
     {
-        $token = $this->authenticate();
-
-        if ($path[0] !== '/') {
-            $path = '/' . $path;
-        }
-
-        $url = $this->baseUrl . $path;
-
-        $requestHeaders = [
-            "X-Lara-Date" => gmdate("D, d M Y H:i:s") . " GMT",
-            "X-Lara-SDK-Name" => "lara-php",
-            "X-Lara-SDK-Version" => Version::get()
-        ];
-
-        if ($this->extraHeaders) {
-            $requestHeaders = array_merge($this->extraHeaders, $requestHeaders);
-        }
-
-        if ($headers) {
-            $requestHeaders = array_merge($headers, $requestHeaders);
-        }
-
-        $requestHeaders['Authorization'] = 'Bearer ' . $token;
-
-        if ($body) {
-            $body = array_filter($body, function ($el) {
-                return isset($el);
-            });
-            if (empty($body)) {
-                $body = null;
-            }
-        }
+        $requestContext = $this->prepareAuthenticatedRequest($path, $body, $headers);
+        $path = $requestContext['path'];
+        $url = $requestContext['url'];
+        $requestHeaders = $requestContext['headers'];
+        $body = $requestContext['body'];
 
         $requestBody = null;
 
@@ -477,6 +485,8 @@ class HttpClient
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
                 return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($requestHeaders), $requestHeaders),
+            CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
+            CURLOPT_TIMEOUT => $this->timeout
         ];
 
         if ($returnStream) {
@@ -745,7 +755,9 @@ class HttpClient
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
                 return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($headers), $headers),
-            CURLOPT_HEADERFUNCTION => $headerCallback
+            CURLOPT_HEADERFUNCTION => $headerCallback,
+            CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
+            CURLOPT_TIMEOUT => $this->timeout
         ];
 
         if ($body !== null) {
