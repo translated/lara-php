@@ -558,6 +558,32 @@ class HttpClient
     }
 
     /**
+     * Checks if the current access token is expired (or about to expire)
+     * @param int $bufferSeconds Seconds before actual expiry to consider token expired
+     * @return bool True if token is expired or will expire within the buffer period
+     */
+    private function isTokenExpired($bufferSeconds = 5)
+    {
+        $token = $this->authToken !== null ? $this->authToken->getToken() : null;
+        if (!$token) {
+            return true;
+        }
+        try {
+            $parts = explode('.', $token);
+            if (count($parts) !== 3) {
+                return true;
+            }
+            $payload = json_decode(base64_decode(strtr($parts[1], '-_', '+/')), true);
+            if (!isset($payload['exp'])) {
+                return false;
+            }
+            return $payload['exp'] <= time() + $bufferSeconds;
+        } catch (\Exception $e) {
+            return true;
+        }
+    }
+
+    /**
      * Authenticates and returns an access token
      * Tries authentication methods in order: existing token, refresh token, access key
      * @return string Access token
@@ -565,8 +591,11 @@ class HttpClient
      */
     protected function authenticate()
     {
-        if ($this->authToken !== null && $this->authToken->getToken() !== null) {
+        if ($this->authToken !== null && $this->authToken->getToken() !== null && !$this->isTokenExpired()) {
             return $this->authToken->getToken();
+        }
+        if ($this->authToken !== null) {
+            $this->authToken->clearToken();
         }
 
         if ($this->authToken !== null && $this->authToken->getRefreshToken() !== null) {
