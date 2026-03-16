@@ -314,7 +314,7 @@ class HttpClient
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_WRITEFUNCTION => $writeFunction,
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
-                return "$key: $value";
+                return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($requestHeaders), $requestHeaders),
         ];
 
@@ -475,7 +475,7 @@ class HttpClient
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => $returnStream ? false : 1,
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
-                return "$key: $value";
+                return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($requestHeaders), $requestHeaders),
         ];
 
@@ -714,7 +714,7 @@ class HttpClient
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_CUSTOMREQUEST => strtoupper($method),
             CURLOPT_HTTPHEADER => array_map(function ($key, $value) {
-                return "$key: $value";
+                return ($value === '' || $value === null) ? "$key;" : "$key: $value";
             }, array_keys($headers), $headers),
             CURLOPT_HEADERFUNCTION => $headerCallback
         ];
