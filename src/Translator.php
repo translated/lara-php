@@ -149,7 +149,25 @@ class Translator
         if ($hint) $data["hint"] = $hint;
         if ($passlist) $data["passlist"] = $passlist;
 
-        return DetectResult::fromResponse($this->client->post("/v2/detect", $data));
+        return DetectResult::fromResponse($this->client->post("/v2/detect/language", $data));
+    }
+
+    /**
+     * @param $text string
+     * @param $language string
+     * @param $contentType string
+     * @return ProfanityDetectResult
+     * @throws LaraException
+     */
+    public function detectProfanities($text, $language, $contentType)
+    {
+        $data = [
+            "text" => $text,
+            "language" => $language,
+            "content_type" => $contentType,
+        ];
+
+        return ProfanityDetectResult::fromResponse($this->client->post("/v2/detect/profanities", $data));
     }
 
 }
