@@ -21,6 +21,20 @@ class TextResult implements \JsonSerializable
             }, $translation);
         }
 
+        $profanities = null;
+        if (isset($response["profanities"])) {
+            $raw = $response["profanities"];
+            if (is_array($raw) && !empty($raw)) {
+                if (isset($raw['masked_text'])) {
+                    $profanities = ProfanityDetectResult::fromResponse($raw);
+                } else {
+                    $profanities = array_map(function ($item) {
+                        return $item !== null ? ProfanityDetectResult::fromResponse($item) : null;
+                    }, $raw);
+                }
+            }
+        }
+
         return new TextResult(
             $response["content_type"],
             $response["source_language"],
@@ -28,7 +42,8 @@ class TextResult implements \JsonSerializable
             isset($response["adapted_to"]) ? $response["adapted_to"] : null,
             isset($response["glossaries"]) ? $response["glossaries"] : null,
             isset($response["adapted_to_matches"]) ? $response["adapted_to_matches"] : null,
-            isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null
+            isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null,
+            $profanities
         );
     }
 
@@ -39,6 +54,7 @@ class TextResult implements \JsonSerializable
     private $glossaries;
     private $adaptedToMatches;
     private $glossariesMatches;
+    private $profanities;
 
     /**
      * @param $contentType string
@@ -48,8 +64,9 @@ class TextResult implements \JsonSerializable
      * @param $glossaries string[]|null
      * @param $adaptedToMatches NGMemoryMatch[]|NGMemoryMatch[][]|null
      * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
+     * @param $profanities ProfanityDetectResult|ProfanityDetectResult[]|null
      */
-    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null)
+    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null)
     {
         $this->contentType = $contentType;
         $this->sourceLanguage = $sourceLanguage;
@@ -58,6 +75,7 @@ class TextResult implements \JsonSerializable
         $this->glossaries = $glossaries;
         $this->adaptedToMatches = $adaptedToMatches;
         $this->glossariesMatches = $glossariesMatches;
+        $this->profanities = $profanities;
     }
 
     /**
@@ -116,6 +134,13 @@ class TextResult implements \JsonSerializable
         return $this->glossariesMatches;
     }
 
+    /**
+     * @return ProfanityDetectResult|ProfanityDetectResult[]|null
+     */
+    public function getProfanities()
+    {
+        return $this->profanities;
+    }
 
     // Compatibility layer for PHP 8.1+
     #[\ReturnTypeWillChange]

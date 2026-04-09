@@ -127,7 +127,32 @@ function main() {
         return;
     }
 
-    // Example 7: Get available languages
+    // Example 7: Profanity filter options
+    echo "=== Translation with Profanity Filter Options ===\n";
+    try {
+        $profanityText = "Don't be such a tool.";
+        $detectResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
+            'profanityFilter' => 'detect',
+            'verbose' => true
+        ]));
+        $hideResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
+            'profanityFilter' => 'hide',
+            'verbose' => true
+        ]));
+        $avoidResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
+            'profanityFilter' => 'avoid',
+            'verbose' => true
+        ]));
+        echo "Original: " . $profanityText . "\n";
+        echo "Detect mode translation: " . $detectResult->getTranslation() . "\n";
+        echo "Hide mode translation: " . $hideResult->getTranslation() . "\n";
+        echo "Avoid mode translation: " . $avoidResult->getTranslation() . "\n\n";
+    } catch (LaraException $e) {
+        echo "Error with profanity filter translation: " . $e->getMessage() . "\n\n";
+        return;
+    }
+
+    // Example 8: Get available languages
     echo "=== Available Languages ===\n";
     try {
         $languages = $lara->getLanguages();
@@ -137,7 +162,7 @@ function main() {
         return;
     }
 
-    // Example 8: Detect language of a given text
+    // Example 9: Detect language of a given text
     echo "=== Detect language ===\n";
     try {
         $detect_result_1 = $lara->detect("Hello, world!");
@@ -147,7 +172,7 @@ function main() {
         return;
     }
 
-    // Example 9: Detect language of a given text with hint and passlist
+    // Example 10: Detect language of a given text with hint and passlist
     echo "=== Detect language with hint and passlist ===\n";
     try {
         $detect_result_2 = $lara->detect("Hello, world!", "en", ["en", "fr"]);

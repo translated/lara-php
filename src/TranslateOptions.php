@@ -20,6 +20,7 @@ class TranslateOptions
     private $headers = null;
     private $reasoning = null;
     private $metadata = null;
+    private $profanityFilter = null;
 
     public function __construct($options = [])
     {
@@ -55,6 +56,8 @@ class TranslateOptions
             $this->setReasoning($options['reasoning']);
         if (isset($options['metadata']))
             $this->setMetadata($options['metadata']);
+        if (isset($options['profanityFilter']))
+            $this->setProfanityFilter($options['profanityFilter']);
 
     }
 
@@ -308,5 +311,21 @@ class TranslateOptions
     public function getMetadata()
     {
         return $this->metadata;
+    }
+
+    /**
+     * @param $profanityFilter string|null "detect", "avoid", or "hide"
+     */
+    public function setProfanityFilter($profanityFilter)
+    {
+        $this->profanityFilter = $profanityFilter;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProfanityFilter()
+    {
+        return $this->profanityFilter;
     }
 }
