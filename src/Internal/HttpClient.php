@@ -534,7 +534,7 @@ class HttpClient
         $responseBody = json_decode($result, true);
 
         if (200 <= $statusCode && $statusCode < 300) {
-            return isset($responseBody['content']) ? $responseBody['content'] : $responseBody;
+            return $responseBody;
         }
 
         if ($statusCode === 401 && !$isRetry) {

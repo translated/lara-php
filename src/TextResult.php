@@ -35,6 +35,11 @@ class TextResult implements \JsonSerializable
             }
         }
 
+        $styleguideResults = null;
+        if (isset($response["styleguide_results"])) {
+            $styleguideResults = StyleguideResults::fromResponse($response["styleguide_results"]);
+        }
+
         return new TextResult(
             $response["content_type"],
             $response["source_language"],
@@ -43,7 +48,8 @@ class TextResult implements \JsonSerializable
             isset($response["glossaries"]) ? $response["glossaries"] : null,
             isset($response["adapted_to_matches"]) ? $response["adapted_to_matches"] : null,
             isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null,
-            $profanities
+            $profanities,
+            $styleguideResults
         );
     }
 
@@ -55,6 +61,7 @@ class TextResult implements \JsonSerializable
     private $adaptedToMatches;
     private $glossariesMatches;
     private $profanities;
+    private $styleguideResults;
 
     /**
      * @param $contentType string
@@ -64,9 +71,10 @@ class TextResult implements \JsonSerializable
      * @param $glossaries string[]|null
      * @param $adaptedToMatches NGMemoryMatch[]|NGMemoryMatch[][]|null
      * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
+     * @param $styleguideResults StyleguideResults|null
      * @param $profanities ProfanityDetectResult|ProfanityDetectResult[]|null
      */
-    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null)
+    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null, $styleguideResults = null)
     {
         $this->contentType = $contentType;
         $this->sourceLanguage = $sourceLanguage;
@@ -76,6 +84,7 @@ class TextResult implements \JsonSerializable
         $this->adaptedToMatches = $adaptedToMatches;
         $this->glossariesMatches = $glossariesMatches;
         $this->profanities = $profanities;
+        $this->styleguideResults = $styleguideResults;
     }
 
     /**
@@ -135,12 +144,20 @@ class TextResult implements \JsonSerializable
     }
 
     /**
+     * @return StyleguideResults|null
+     */
+    public function getStyleguideResults()
+    {
+        return $this->styleguideResults;
+    }
+    /**
      * @return ProfanityDetectResult|ProfanityDetectResult[]|null
      */
     public function getProfanities()
     {
         return $this->profanities;
     }
+
 
     // Compatibility layer for PHP 8.1+
     #[\ReturnTypeWillChange]

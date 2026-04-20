@@ -25,6 +25,11 @@ class Translator
     public $glossaries;
 
     /**
+     * @var Styleguides
+     */
+    public $styleguides;
+
+    /**
      * @var ImageTranslator
      */
     public $images;
@@ -49,6 +54,7 @@ class Translator
         $this->memories = new Memories($this->client);
         $this->documents = new Documents($this->client);
         $this->glossaries = new Glossaries($this->client);
+        $this->styleguides = new Styleguides($this->client);
         $this->audio = new AudioTranslator($this->client);
         $this->images = new ImageTranslator($this->client);
     }
@@ -117,6 +123,9 @@ class Translator
             if ($options->isReasoning() !== null) $data["reasoning"] = $options->isReasoning();
             if ($options->getMetadata() !== null) $data["metadata"] = $options->getMetadata();
             if ($options->getProfanityFilter() !== null) $data["profanity_filter"] = $options->getProfanityFilter();
+            if ($options->getStyleguideId() !== null) $data["styleguide_id"] = $options->getStyleguideId();
+            if ($options->isStyleguideReasoning() !== null) $data["styleguide_reasoning"] = $options->isStyleguideReasoning();
+            if ($options->getStyleguideExplanationLanguage() !== null) $data["styleguide_explanation_language"] = $options->getStyleguideExplanationLanguage();
 
             if ($options->getHeaders() !== null) {
                 foreach ($options->getHeaders() as $name => $value) {

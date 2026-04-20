@@ -21,6 +21,9 @@ class TranslateOptions
     private $reasoning = null;
     private $metadata = null;
     private $profanityFilter = null;
+    private $styleguideId = null;
+    private $styleguideReasoning = null;
+    private $styleguideExplanationLanguage = null;
 
     public function __construct($options = [])
     {
@@ -58,6 +61,12 @@ class TranslateOptions
             $this->setMetadata($options['metadata']);
         if (isset($options['profanityFilter']))
             $this->setProfanityFilter($options['profanityFilter']);
+        if (isset($options['styleguideId']))
+            $this->setStyleguideId($options['styleguideId']);
+        if (isset($options['styleguideReasoning']))
+            $this->setStyleguideReasoning($options['styleguideReasoning']);
+        if (isset($options['styleguideExplanationLanguage']))
+            $this->setStyleguideExplanationLanguage($options['styleguideExplanationLanguage']);
 
     }
 
@@ -327,5 +336,53 @@ class TranslateOptions
     public function getProfanityFilter()
     {
         return $this->profanityFilter;
+    }
+
+    /**
+     * @param $styleguideId string|null
+     */
+    public function setStyleguideId($styleguideId)
+    {
+        $this->styleguideId = $styleguideId;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStyleguideId()
+    {
+        return $this->styleguideId;
+    }
+
+    /**
+     * @param $styleguideReasoning bool|null
+     */
+    public function setStyleguideReasoning($styleguideReasoning)
+    {
+        $this->styleguideReasoning = $styleguideReasoning;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isStyleguideReasoning()
+    {
+        return $this->styleguideReasoning;
+    }
+
+    /**
+     * @param $styleguideExplanationLanguage string|null
+     */
+    public function setStyleguideExplanationLanguage($styleguideExplanationLanguage)
+    {
+        $this->styleguideExplanationLanguage = $styleguideExplanationLanguage;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getStyleguideExplanationLanguage()
+    {
+        return $this->styleguideExplanationLanguage;
     }
 }
