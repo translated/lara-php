@@ -181,6 +181,37 @@ function main() {
         echo "Error detecting language: " . $e->getMessage() . "\n";
         return;
     }
+
+    // Example 11: Quality estimation for a single sentence pair
+    echo "\n=== Quality Estimation: single sentence ===\n";
+    try {
+        $qeSingle = $lara->qualityEstimation(
+            "en-US",
+            "it-IT",
+            "Hello, how are you today?",
+            "Ciao, come stai oggi?"
+        );
+        echo "Score: " . $qeSingle->getScore() . "\n";
+    } catch (LaraException $e) {
+        echo "Error in quality estimation: " . $e->getMessage() . "\n";
+        return;
+    }
+
+    // Example 12: Quality estimation for a batch of sentence pairs
+    echo "\n=== Quality Estimation: batch ===\n";
+    try {
+        $qeBatch = $lara->qualityEstimation(
+            "en-US",
+            "it-IT",
+            ["Good morning.", "The weather is nice."],
+            ["Buongiorno.", "Il tempo è bello."]
+        );
+        $scores = array_map(function ($r) { return $r->getScore(); }, $qeBatch);
+        echo "Scores: [" . implode(", ", $scores) . "]\n";
+    } catch (LaraException $e) {
+        echo "Error in quality estimation: " . $e->getMessage() . "\n";
+        return;
+    }
 }
 
 main();

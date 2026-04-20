@@ -195,6 +195,32 @@ $options = new TranslateOptions([
 $result = $lara->translate("Hello", "en-US", "fr-FR", $options);
 ```
 
+#### Quality Estimation
+
+Use `qualityEstimation()` to score how well a translation matches its source. Pass a single sentence/translation pair to get a single result, or two parallel arrays to get one result per pair.
+
+```php
+// Single pair
+$single = $lara->qualityEstimation(
+    "en-US",
+    "it-IT",
+    "Hello, how are you today?",
+    "Ciao, come stai oggi?"
+);
+echo $single->getScore(); // e.g. 0.768
+
+// Batch
+$batch = $lara->qualityEstimation(
+    "en-US",
+    "it-IT",
+    ["Good morning.", "The weather is nice."],
+    ["Buongiorno.", "Il tempo è bello."]
+);
+foreach ($batch as $r) {
+    echo $r->getScore() . "\n"; // e.g. 0.751, 0.713
+}
+```
+
 ### 📖 Document Translation
 #### Simple document translation
 

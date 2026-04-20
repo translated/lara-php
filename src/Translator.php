@@ -180,4 +180,31 @@ class Translator
         return ProfanityDetectResult::fromResponse($this->client->post("/v2/detect/profanities", $data));
     }
 
+    /**
+     * @param $source string
+     * @param $target string
+     * @param $sentence string|string[]
+     * @param $translation string|string[]
+     * @return QualityEstimationResult|QualityEstimationResult[]
+     * @throws LaraException
+     */
+    public function qualityEstimation($source, $target, $sentence, $translation)
+    {
+        $data = [
+            "source" => $source,
+            "target" => $target,
+            "sentence" => $sentence,
+            "translation" => $translation,
+        ];
+
+        $response = $this->client->post("/v2/detect/quality-estimation", $data);
+
+        if (isset($response["score"])) {
+            return QualityEstimationResult::fromResponse($response);
+        }
+        return array_map(function ($r) {
+            return QualityEstimationResult::fromResponse($r);
+        }, $response);
+    }
+
 }
