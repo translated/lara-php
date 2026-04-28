@@ -12,7 +12,7 @@ class ProfanityDetectResult
     public static function fromResponse($response)
     {
         $profanities = [];
-        if (isset($response['profanities'])) {
+        if (isset($response['profanities']) && is_array($response['profanities'])) {
             foreach ($response['profanities'] as $p) {
                 $profanities[] = [
                     'text' => $p['text'],
@@ -25,25 +25,29 @@ class ProfanityDetectResult
 
         return new ProfanityDetectResult(
             $response['masked_text'],
-            $profanities
+            $profanities,
+            isset($response['error']) ? $response['error'] : null
         );
     }
 
     private $maskedText;
     private $profanities;
+    private $error;
 
     /**
-     * @param $maskedText string|null
+     * @param $maskedText string
      * @param $profanities array[]
+     * @param $error string|null
      */
-    public function __construct($maskedText, $profanities = [])
+    public function __construct($maskedText, $profanities = [], $error = null)
     {
         $this->maskedText = $maskedText;
         $this->profanities = $profanities;
+        $this->error = $error;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getMaskedText()
     {
@@ -56,5 +60,13 @@ class ProfanityDetectResult
     public function getProfanities()
     {
         return $this->profanities;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getError()
+    {
+        return $this->error;
     }
 }

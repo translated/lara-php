@@ -22,17 +22,8 @@ class TextResult implements \JsonSerializable
         }
 
         $profanities = null;
-        if (isset($response["profanities"])) {
-            $raw = $response["profanities"];
-            if (is_array($raw) && !empty($raw)) {
-                if (isset($raw['masked_text'])) {
-                    $profanities = ProfanityDetectResult::fromResponse($raw);
-                } else {
-                    $profanities = array_map(function ($item) {
-                        return $item !== null ? ProfanityDetectResult::fromResponse($item) : null;
-                    }, $raw);
-                }
-            }
+        if (isset($response["profanities"]) && is_array($response["profanities"])) {
+            $profanities = ProfanitiesResult::fromResponse($response["profanities"]);
         }
 
         $styleguideResults = null;
@@ -71,8 +62,8 @@ class TextResult implements \JsonSerializable
      * @param $glossaries string[]|null
      * @param $adaptedToMatches NGMemoryMatch[]|NGMemoryMatch[][]|null
      * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
+     * @param $profanities ProfanitiesResult|null
      * @param $styleguideResults StyleguideResults|null
-     * @param $profanities ProfanityDetectResult|ProfanityDetectResult[]|null
      */
     public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null, $styleguideResults = null)
     {
@@ -151,7 +142,7 @@ class TextResult implements \JsonSerializable
         return $this->styleguideResults;
     }
     /**
-     * @return ProfanityDetectResult|ProfanityDetectResult[]|null
+     * @return ProfanitiesResult|null
      */
     public function getProfanities()
     {

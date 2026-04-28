@@ -122,7 +122,8 @@ class Translator
             if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
             if ($options->isReasoning() !== null) $data["reasoning"] = $options->isReasoning();
             if ($options->getMetadata() !== null) $data["metadata"] = $options->getMetadata();
-            if ($options->getProfanityFilter() !== null) $data["profanity_filter"] = $options->getProfanityFilter();
+            if ($options->getProfanitiesDetect() !== null) $data["profanities_detect"] = $options->getProfanitiesDetect();
+            if ($options->getProfanitiesHandling() !== null) $data["profanities_handling"] = $options->getProfanitiesHandling();
             if ($options->getStyleguideId() !== null) $data["styleguide_id"] = $options->getStyleguideId();
             if ($options->isStyleguideReasoning() !== null) $data["styleguide_reasoning"] = $options->isStyleguideReasoning();
             if ($options->getStyleguideExplanationLanguage() !== null) $data["styleguide_explanation_language"] = $options->getStyleguideExplanationLanguage();

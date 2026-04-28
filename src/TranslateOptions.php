@@ -20,7 +20,8 @@ class TranslateOptions
     private $headers = null;
     private $reasoning = null;
     private $metadata = null;
-    private $profanityFilter = null;
+    private $profanitiesDetect = null;
+    private $profanitiesHandling = null;
     private $styleguideId = null;
     private $styleguideReasoning = null;
     private $styleguideExplanationLanguage = null;
@@ -59,8 +60,10 @@ class TranslateOptions
             $this->setReasoning($options['reasoning']);
         if (isset($options['metadata']))
             $this->setMetadata($options['metadata']);
-        if (isset($options['profanityFilter']))
-            $this->setProfanityFilter($options['profanityFilter']);
+        if (isset($options['profanitiesDetect']))
+            $this->setProfanitiesDetect($options['profanitiesDetect']);
+        if (isset($options['profanitiesHandling']))
+            $this->setProfanitiesHandling($options['profanitiesHandling']);
         if (isset($options['styleguideId']))
             $this->setStyleguideId($options['styleguideId']);
         if (isset($options['styleguideReasoning']))
@@ -323,19 +326,35 @@ class TranslateOptions
     }
 
     /**
-     * @param $profanityFilter string|null "detect", "avoid", or "hide"
+     * @param $profanitiesDetect string|null "target" or "source_target"
      */
-    public function setProfanityFilter($profanityFilter)
+    public function setProfanitiesDetect($profanitiesDetect)
     {
-        $this->profanityFilter = $profanityFilter;
+        $this->profanitiesDetect = $profanitiesDetect;
     }
 
     /**
      * @return string|null
      */
-    public function getProfanityFilter()
+    public function getProfanitiesDetect()
     {
-        return $this->profanityFilter;
+        return $this->profanitiesDetect;
+    }
+
+    /**
+     * @param $profanitiesHandling string|null "hide", "avoid", or "detect"
+     */
+    public function setProfanitiesHandling($profanitiesHandling)
+    {
+        $this->profanitiesHandling = $profanitiesHandling;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getProfanitiesHandling()
+    {
+        return $this->profanitiesHandling;
     }
 
     /**

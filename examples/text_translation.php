@@ -127,28 +127,25 @@ function main() {
         return;
     }
 
-    // Example 7: Profanity filter options
-    echo "=== Translation with Profanity Filter Options ===\n";
+    // Example 7: Profanities detection and handling options
+    echo "=== Translation with Profanities Detection and Handling Options ===\n";
     try {
         $profanityText = "Don't be such a tool.";
         $detectResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
-            'profanityFilter' => 'detect',
+            'profanitiesDetect' => 'source_target',
+            'profanitiesHandling' => 'detect',
             'verbose' => true
         ]));
         $hideResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
-            'profanityFilter' => 'hide',
-            'verbose' => true
-        ]));
-        $avoidResult = $lara->translate($profanityText, "en-US", "it-IT", new TranslateOptions([
-            'profanityFilter' => 'avoid',
+            'profanitiesDetect' => 'target',
+            'profanitiesHandling' => 'hide',
             'verbose' => true
         ]));
         echo "Original: " . $profanityText . "\n";
         echo "Detect mode translation: " . $detectResult->getTranslation() . "\n";
         echo "Hide mode translation: " . $hideResult->getTranslation() . "\n";
-        echo "Avoid mode translation: " . $avoidResult->getTranslation() . "\n\n";
     } catch (LaraException $e) {
-        echo "Error with profanity filter translation: " . $e->getMessage() . "\n\n";
+        echo "Error with profanities detection translation: " . $e->getMessage() . "\n\n";
         return;
     }
 
