@@ -144,7 +144,7 @@ class Translator
             };
         }
 
-        return TextResult::fromResponse($this->client->postStream("/translate", $data, null, $headers, $wrappedCallback));
+        return TextResult::fromResponse($this->client->postStream("/v2/translate", $data, null, $headers, $wrappedCallback));
     }
 
     /**

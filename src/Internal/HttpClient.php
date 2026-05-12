@@ -191,11 +191,7 @@ class HttpClient
             return null;
         }
 
-        $status = isset($parsed['status']) ? $parsed['status'] : null;
-        $data = isset($parsed['data']) ? $parsed['data'] : $parsed;
-        $content = isset($data['content']) ? $data['content'] : $data;
-
-        return ['status' => $status, 'data' => $content];
+        return ['status' => null, 'data' => $parsed];
     }
 
     /**
@@ -319,13 +315,8 @@ class HttpClient
 
                 $chunkStatus = $chunk['status'];
 
-                // Skip chunks without a status (invalid format)
-                if ($chunkStatus === null) {
-                    continue;
-                }
-
                 // Check for errors (401 or any non-2xx)
-                if ($chunkStatus < 200 || $chunkStatus >= 300) {
+                if ($chunkStatus !== null && ($chunkStatus < 200 || $chunkStatus >= 300)) {
                     $hadError = true;
                     $errorChunk = $chunk;
                     // Abort transfer immediately on error
@@ -392,22 +383,19 @@ class HttpClient
             if ($chunk !== null) {
                 $chunkStatus = $chunk['status'];
 
-                // Skip chunks without a status (invalid format)
-                if ($chunkStatus !== null) {
-                    // Check for errors in final buffer chunk
-                    if ($chunkStatus < 200 || $chunkStatus >= 300) {
-                        // Handle 401 - token expired, refresh and retry
-                        if (!$isRetry && $chunkStatus === 401) {
-                            $this->authToken->clearToken();
-                            return $this->authenticatedStreamRequest($method, $path, $body, $files, $headers, $callback, true);
-                        }
-                        $this->throwApiException($chunkStatus, $chunk['data']);
+                // Check for errors in final buffer chunk
+                if ($chunkStatus !== null && ($chunkStatus < 200 || $chunkStatus >= 300)) {
+                    // Handle 401 - token expired, refresh and retry
+                    if (!$isRetry && $chunkStatus === 401) {
+                        $this->authToken->clearToken();
+                        return $this->authenticatedStreamRequest($method, $path, $body, $files, $headers, $callback, true);
                     }
+                    $this->throwApiException($chunkStatus, $chunk['data']);
+                }
 
-                    $lastResult = $chunk['data'];
-                    if ($callback !== null) {
-                        call_user_func($callback, $lastResult);
-                    }
+                $lastResult = $chunk['data'];
+                if ($callback !== null) {
+                    call_user_func($callback, $lastResult);
                 }
             }
         }
@@ -415,7 +403,7 @@ class HttpClient
         // Fallback: check HTTP status code for non-streamed errors
         $statusCode = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
         if ($statusCode < 200 || $statusCode >= 300) {
-            $this->throwApiException($statusCode, null);
+            $this->throwApiException($statusCode, $lastResult);
         }
 
         if ($lastResult === null) {
@@ -538,8 +526,7 @@ class HttpClient
         }
 
         if ($statusCode === 401 && !$isRetry) {
-            $error = isset($responseBody) ? $responseBody : [];
-            $errorMessage = isset($error['message']) ? $error['message'] : (isset($error['error']['message']) ? $error['error']['message'] : null);
+            $errorMessage = isset($responseBody['message']) ? $responseBody['message'] : null;
 
             if ($errorMessage === 'jwt expired') {
                 $this->authToken->clearToken();
@@ -559,11 +546,10 @@ class HttpClient
      */
     private function throwApiException($statusCode, $responseBody, $defaultMessage = 'An unknown error occurred')
     {
-        $error = isset($responseBody['error']) ? $responseBody['error'] : $responseBody;
         throw new LaraApiException(
             $statusCode,
-            isset($error['type']) ? $error['type'] : 'UnknownError',
-            isset($error['message']) ? $error['message'] : $defaultMessage
+            isset($responseBody['type']) ? $responseBody['type'] : 'UnknownError',
+            isset($responseBody['message']) ? $responseBody['message'] : $defaultMessage
         );
     }
 
@@ -783,7 +769,7 @@ class HttpClient
         }
 
         return [
-            'body' => isset($responseBody['content']) ? $responseBody['content'] : $responseBody,
+            'body' => $responseBody,
             'headers' => $responseHeaders,
             'statusCode' => $statusCode
         ];
