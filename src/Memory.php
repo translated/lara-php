@@ -18,6 +18,7 @@ class Memory implements \JsonSerializable
             $response['name'],
             $response['owner_id'],
             $response['collaborators_count'],
+            $response['is_personal'],
             isset($response['external_id']) ? $response['external_id'] : null,
             isset($response['secret']) ? $response['secret'] : null
         );
@@ -32,6 +33,7 @@ class Memory implements \JsonSerializable
     private $collaboratorsCount;
     private $externalId;
     private $secret;
+    private $isPersonal;
 
     /**
      * @param $id string
@@ -41,11 +43,12 @@ class Memory implements \JsonSerializable
      * @param $name string
      * @param $ownerId string
      * @param $collaboratorsCount int
+     * @param $isPersonal bool
      * @param $externalId string|null
      * @param $secret string|null
      */
     public function __construct($id, $createdAt, $updatedAt, $sharedAt, $name, $ownerId, $collaboratorsCount,
-                                $externalId = null, $secret = null)
+                                $isPersonal, $externalId = null, $secret = null)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
@@ -54,6 +57,7 @@ class Memory implements \JsonSerializable
         $this->name = $name;
         $this->ownerId = $ownerId;
         $this->collaboratorsCount = $collaboratorsCount;
+        $this->isPersonal = $isPersonal;
         $this->externalId = $externalId;
         $this->secret = $secret;
     }
@@ -128,6 +132,14 @@ class Memory implements \JsonSerializable
     public function getSecret()
     {
         return $this->secret;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPersonal()
+    {
+        return $this->isPersonal;
     }
 
     public function __toString()

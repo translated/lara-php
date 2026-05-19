@@ -16,6 +16,7 @@ class Styleguide implements \JsonSerializable
             $response['updated_at'],
             $response['name'],
             $response['owner_id'],
+            $response['is_personal'],
             isset($response['content']) ? $response['content'] : null
         );
     }
@@ -25,6 +26,7 @@ class Styleguide implements \JsonSerializable
     private $updatedAt;
     private $name;
     private $ownerId;
+    private $isPersonal;
     private $content;
 
     /**
@@ -33,15 +35,17 @@ class Styleguide implements \JsonSerializable
      * @param $updatedAt string
      * @param $name string
      * @param $ownerId string
+     * @param $isPersonal bool
      * @param $content string|null
      */
-    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId, $content = null)
+    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId, $isPersonal, $content = null)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->name = $name;
         $this->ownerId = $ownerId;
+        $this->isPersonal = $isPersonal;
         $this->content = $content;
     }
 
@@ -83,6 +87,14 @@ class Styleguide implements \JsonSerializable
     public function getOwnerId()
     {
         return $this->ownerId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPersonal()
+    {
+        return $this->isPersonal;
     }
 
     /**

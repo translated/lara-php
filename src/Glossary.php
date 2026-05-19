@@ -15,7 +15,8 @@ class Glossary implements \JsonSerializable
             $response['created_at'],
             $response['updated_at'],
             $response['name'],
-            $response['owner_id']
+            $response['owner_id'],
+            $response['is_personal']
         );
     }
 
@@ -24,6 +25,7 @@ class Glossary implements \JsonSerializable
     private $updatedAt;
     private $name;
     private $ownerId;
+    private $isPersonal;
 
     /**
      * @param $id string
@@ -31,14 +33,16 @@ class Glossary implements \JsonSerializable
      * @param $updatedAt string
      * @param $name string
      * @param $ownerId string
+     * @param $isPersonal bool
      */
-    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId)
+    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId, $isPersonal)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
         $this->name = $name;
         $this->ownerId = $ownerId;
+        $this->isPersonal = $isPersonal;
     }
 
     /**
@@ -79,6 +83,14 @@ class Glossary implements \JsonSerializable
     public function getOwnerId()
     {
         return $this->ownerId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsPersonal()
+    {
+        return $this->isPersonal;
     }
 
     public function __toString()
