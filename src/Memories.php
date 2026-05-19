@@ -101,14 +101,17 @@ class Memories
      * @param $id string
      * @param $tmx string
      * @param $gzip bool
+     * @param $callbackUrl string|null
      * @return MemoryImport
      * @throws LaraException
      */
-    public function importTmx($id, $tmx, $gzip = false)
+    public function importTmx($id, $tmx, $gzip = false, $callbackUrl = null)
     {
-        return MemoryImport::fromResponse($this->client->post("/v2/memories/$id/import", [
-            'compression' => $gzip ? 'gzip' : null
-        ], [
+        $body = ['compression' => $gzip ? 'gzip' : null];
+        if ($callbackUrl !== null) {
+            $body['callback_url'] = $callbackUrl;
+        }
+        return MemoryImport::fromResponse($this->client->post("/v2/memories/$id/import", $body, [
             'tmx' => $tmx
         ]));
     }
@@ -121,6 +124,22 @@ class Memories
     public function getImportStatus($id)
     {
         return MemoryImport::fromResponse($this->client->get("/v2/memories/imports/$id"));
+    }
+
+    /**
+     * @param $id string
+     * @param $callbackUrl string
+     * @param $format string|null 'tmx' or 'jtm'
+     * @return MemoryExport
+     * @throws LaraException
+     */
+    public function exportAsync($id, $callbackUrl, $format = null)
+    {
+        $params = ['callback_url' => $callbackUrl];
+        if ($format !== null) {
+            $params['format'] = $format;
+        }
+        return MemoryExport::fromResponse($this->client->get("/v2/memories/$id/export/async", $params));
     }
 
     /**

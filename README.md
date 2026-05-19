@@ -304,6 +304,33 @@ $memoryImport = $lara->memories->addTranslation(
 $tmxFilePath = "/path/to/your/memory.tmx";  // Replace with actual TMX file path
 $memoryImport = $lara->memories->importTmx("mem_1A2b3C4d5E6f7G8h9I0jKl", $tmxFilePath);
 
+// TMX import with gzip compression
+$memoryImport = $lara->memories->importTmx("mem_1A2b3C4d5E6f7G8h9I0jKl", $tmxFilePath, true);
+
+// TMX import with a callback URL (notified when the import completes)
+$memoryImport = $lara->memories->importTmx(
+    "mem_1A2b3C4d5E6f7G8h9I0jKl",
+    $tmxFilePath,
+    false,
+    "https://your-server.example.com/lara/import-callback"
+);
+
+// TMX import with both gzip compression and a callback URL
+$memoryImport = $lara->memories->importTmx(
+    "mem_1A2b3C4d5E6f7G8h9I0jKl",
+    $tmxFilePath,
+    true,
+    "https://your-server.example.com/lara/import-callback"
+);
+
+// Async memory export - returns a job ID; the result is delivered to your callback URL when ready
+$exportJob = $lara->memories->exportAsync(
+    "mem_1A2b3C4d5E6f7G8h9I0jKl",
+    "https://your-server.example.com/lara/export-callback",
+    "tmx" // optional, defaults to the server-side default ("tmx" or "jtm")
+);
+$jobId = $exportJob->getJobId();
+
 // Delete translation
 // Important: if you omit tuid, all entries that match the provided fields will be removed
 $deleteJob = $lara->memories->deleteTranslation(

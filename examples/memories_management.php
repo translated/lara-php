@@ -10,6 +10,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * - Add individual translations
  * - Multiple memory operations
  * - TMX file import with progress monitoring
+ * - TMX import with a callback URL (async notification)
+ * - Async memory export with callback URL
  * - Translation deletion
  * - Translation with TUID and context
  */
@@ -129,7 +131,37 @@ function main() {
         echo "TMX file not found: $tmxFilePath\n";
     }
 
-    // Example 5: Translation deletion
+    // Example 5: TMX import with a callback URL (async notification when import completes)
+    echo "=== TMX Import with Callback URL ===\n";
+    if (file_exists($tmxFilePath)) {
+        try {
+            $callbackUrl = "https://your-server.example.com/lara/import-callback";  // Replace with your endpoint
+            $tmxImportWithCallback = $lara->memories->importTmx($memoryId, $tmxFilePath, false, $callbackUrl);
+            echo "Import started with ID: " . $tmxImportWithCallback->getId() . " (callback: $callbackUrl)\n";
+
+            // You can also combine gzip + callbackUrl:
+            // $lara->memories->importTmx($memoryId, $tmxFilePath, true, $callbackUrl);
+            echo "\n";
+        } catch (LaraException $e) {
+            echo "Error starting TMX import with callback: " . $e->getMessage() . "\n\n";
+        }
+    } else {
+        echo "TMX file not found: $tmxFilePath\n\n";
+    }
+
+    // Example 6: Async memory export
+    // Starts an export job; the result is delivered asynchronously to the provided callback URL.
+    echo "=== Async Memory Export ===\n";
+    try {
+        $exportCallbackUrl = "https://your-server.example.com/lara/export-callback";  // Replace with your endpoint
+        $exportJob = $lara->memories->exportAsync($memoryId, $exportCallbackUrl, "tmx");
+        echo "✅ Export job started (Job ID: " . $exportJob->getJobId() . ")\n";
+        echo "The export result will be delivered to: $exportCallbackUrl\n\n";
+    } catch (LaraException $e) {
+        echo "Error starting async export: " . $e->getMessage() . "\n\n";
+    }
+
+    // Example 7: Translation deletion
     echo "=== Translation Deletion ===\n";
     try {
         // Delete a specific translation unit (with TUID)
