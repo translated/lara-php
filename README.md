@@ -25,7 +25,7 @@ Lara's SDK full documentation is available at [https://developers.laratranslate.
 ### Installation
 
 ```bash
-composer require translated/lara-php
+composer require translated/lara-sdk
 ```
 
 ### Basic Usage
