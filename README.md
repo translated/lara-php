@@ -264,7 +264,7 @@ use Lara\ImageTextTranslationOptions;
 
 // Translate image and receive a translated image stream
 $translatedImageStream = $lara->images->translate("/path/to/your/image.png", "en", "fr", new ImageTranslationOptions([
-    'textRemoval' => 'inpainting',
+    'model' => 'inpainting',
     'style' => 'faithful'
 ]));
 

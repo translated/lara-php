@@ -8,6 +8,7 @@ class ImageTranslationOptions
     private $glossaries = null;
     private $style = null;
     private $textRemoval = null;
+    private $model = null;
     private $noTrace = null;
 
     public function __construct($options = [])
@@ -20,6 +21,8 @@ class ImageTranslationOptions
             $this->setStyle($options['style']);
         if (isset($options['textRemoval']))
             $this->setTextRemoval($options['textRemoval']);
+        if (isset($options['model']))
+            $this->setModel($options['model']);
         if (isset($options['noTrace']))
             $this->setNoTrace($options['noTrace']);
     }
@@ -73,6 +76,7 @@ class ImageTranslationOptions
     }
 
     /**
+     * @deprecated Use setModel() instead.
      * @param $textRemoval string|null "overlay" or "inpainting"
      */
     public function setTextRemoval($textRemoval)
@@ -86,6 +90,22 @@ class ImageTranslationOptions
     public function getTextRemoval()
     {
         return $this->textRemoval;
+    }
+
+    /**
+     * @param $model string|null "overlay", "inpainting", "generative" or "generative_fast"
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getModel()
+    {
+        return $this->model;
     }
 
     /**

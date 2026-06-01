@@ -45,7 +45,7 @@ function main() {
 
     try {
         $translatedStream = $lara->images->translate($sampleFilePath, $sourceLang, $targetLang, new ImageTranslationOptions([
-            'textRemoval' => 'overlay'
+            'model' => 'overlay'
         ]));
 
         $outputPath = __DIR__ . '/sample_image_translated.png';
@@ -68,7 +68,7 @@ function main() {
             'adaptTo' => ['mem_1A2b3C4d5E6f7G8h9I0jKl'],       // Replace with actual memory IDs
             'glossaries' => ['gls_1A2b3C4d5E6f7G8h9I0jKl'],    // Replace with actual glossary IDs
             'style' => 'faithful',
-            'textRemoval' => 'inpainting'
+            'model' => 'inpainting'
         ]));
 
         $advancedOutputPath = __DIR__ . '/advanced_image_translated.png';

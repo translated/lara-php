@@ -122,6 +122,19 @@ class HttpClient
      * @param $body array|null
      * @param $files array|null
      * @param $headers array|null
+     * @return resource
+     * @throws LaraException
+     */
+    public function postBinaryStream($path, $body = null, $files = null, $headers = null)
+    {
+        return $this->authenticatedRequest('POST', $path, $body, $files, $headers, false, true);
+    }
+
+    /**
+     * @param $path string
+     * @param $body array|null
+     * @param $files array|null
+     * @param $headers array|null
      * @param $callback callable|null Callback function for each chunk (chunk) => void
      * @return mixed Last result
      * @throws LaraException

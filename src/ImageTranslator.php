@@ -38,13 +38,14 @@ class ImageTranslator
             if ($options->getAdaptTo() !== null) $data["adapt_to"] = $options->getAdaptTo();
             if ($options->getGlossaries() !== null) $data["glossaries"] = $options->getGlossaries();
             if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
-            if ($options->getTextRemoval() !== null) $data["text_removal"] = $options->getTextRemoval();
+            $model = $options->getModel() !== null ? $options->getModel() : $options->getTextRemoval();
+            if ($model !== null) $data["model"] = $model;
             if ($options->isNoTrace()) $headers["X-No-Trace"] = "true";
         }
 
         $files = ["image" => $filePath];
 
-        return $this->client->postStream("/v2/images/translate", $data, $files, $headers);
+        return $this->client->postBinaryStream("/v2/images/translate", $data, $files, $headers);
     }
 
     /**
