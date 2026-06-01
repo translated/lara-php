@@ -2,7 +2,7 @@
 
 namespace Lara;
 
-class StyleguideResults
+class StyleguideResults implements \JsonSerializable
 {
 
     /**
@@ -11,6 +11,16 @@ class StyleguideResults
      */
     public static function fromResponse($response)
     {
+        $originalTranslation = isset($response['original_translation']) ? $response['original_translation'] : null;
+        if (is_array($originalTranslation)) {
+            $originalTranslation = array_map(function ($e) {
+                if (is_string($e))
+                    return $e;
+                else
+                    return TextBlock::fromResponse($e);
+            }, $originalTranslation);
+        }
+
         $changes = [];
         if (isset($response['changes'])) {
             foreach ($response['changes'] as $change) {
@@ -18,10 +28,7 @@ class StyleguideResults
             }
         }
 
-        return new StyleguideResults(
-            isset($response['original_translation']) ? $response['original_translation'] : null,
-            $changes
-        );
+        return new StyleguideResults($originalTranslation, $changes);
     }
 
     private $originalTranslation;
@@ -51,5 +58,12 @@ class StyleguideResults
     public function getChanges()
     {
         return $this->changes;
+    }
+
+    // Compatibility layer for PHP 8.1+
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

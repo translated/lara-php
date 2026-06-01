@@ -296,9 +296,11 @@ class HttpClient
         }
 
         if (!$files) {
-            if (!empty($body)) {
+            if ($body !== null) {
                 $requestHeaders["Content-Type"] = "application/json";
-                $requestBody = json_encode($body);
+                // Encode an empty body as a JSON object ({}) rather than an array ([]),
+                // since request payloads are always JSON objects.
+                $requestBody = json_encode(empty($body) ? new \stdClass() : $body);
             }
         }
 
@@ -467,9 +469,11 @@ class HttpClient
         }
 
         if (!$files) {
-            if (!empty($body)) {
+            if ($body !== null) {
                 $requestHeaders["Content-Type"] = "application/json";
-                $requestBody = json_encode($body);
+                // Encode an empty body as a JSON object ({}) rather than an array ([]),
+                // since request payloads are always JSON objects.
+                $requestBody = json_encode(empty($body) ? new \stdClass() : $body);
             }
         }
 

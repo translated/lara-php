@@ -2,7 +2,7 @@
 
 namespace Lara;
 
-class StyleguideChange
+class StyleguideChange implements \JsonSerializable
 {
 
     /**
@@ -62,5 +62,12 @@ class StyleguideChange
     public function getExplanation()
     {
         return $this->explanation;
+    }
+
+    // Compatibility layer for PHP 8.1+
+    #[\ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
     }
 }

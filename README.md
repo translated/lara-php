@@ -13,6 +13,7 @@ All major translation features are accessible, making it easy to integrate and c
 - **Image Translation**: Translate whole images or extract and translate text blocks
 - **Translation Memory**: Store and reuse translations for consistency
 - **Glossaries**: Enforce terminology standards across translations
+- **Styleguides**: Define tone, voice, and writing style rules for translations
 - **Language Detection**: Automatic source language identification
 - **Advanced Options**: Translation instructions and more
 
@@ -129,6 +130,17 @@ php memories_management.php
 ```bash
 cd examples
 php glossaries_management.php
+```
+
+### Styleguide Management
+- **[styleguides_management.php](examples/styleguides_management.php)** - Styleguide management examples
+  - Create, list, get, update, delete styleguides
+  - Update name, content, or both at once
+  - Handling of non-existent styleguides
+
+```bash
+cd examples
+php styleguides_management.php
 ```
 
 ## 🔧 API Reference
@@ -362,6 +374,32 @@ $csvData = $lara->glossaries->export("gls_1A2b3C4d5E6f7G8h9I0jKl", "csv/table-un
 
 // Get glossary terms count
 $counts = $lara->glossaries->counts("gls_1A2b3C4d5E6f7G8h9I0jKl");
+```
+
+### 📋 Styleguide Management
+
+```php
+// Create styleguide
+$styleguide = $lara->styleguides->create("MyStyleguide", "Always use formal language.");
+
+// List all styleguides
+$styleguides = $lara->styleguides->getAll();
+
+// Get a specific styleguide
+$styleguide = $lara->styleguides->get("stg_1A2b3C4d5E6f7G8h9I0jKl");
+
+// Update styleguide — pass null for fields you don't want to change
+// Update only the name
+$styleguide = $lara->styleguides->update("stg_1A2b3C4d5E6f7G8h9I0jKl", "UpdatedStyleguide");
+
+// Update only the content
+$styleguide = $lara->styleguides->update("stg_1A2b3C4d5E6f7G8h9I0jKl", null, "Always use informal language.");
+
+// Update both
+$styleguide = $lara->styleguides->update("stg_1A2b3C4d5E6f7G8h9I0jKl", "UpdatedStyleguide", "Always use informal language.");
+
+// Delete styleguide
+$styleguide = $lara->styleguides->delete("stg_1A2b3C4d5E6f7G8h9I0jKl");
 ```
 
 ### Translation Options
