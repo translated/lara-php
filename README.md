@@ -123,7 +123,7 @@ php memories_management.php
 - **[glossaries_management.php](examples/glossaries_management.php)** - Glossary management examples
   - Create, list, update, delete glossaries
   - CSV import with status monitoring
-  - Glossary export
+  - Glossary export (sync and async)
   - Glossary terms count
   - Import status checking
 
@@ -371,6 +371,15 @@ $completedImport = $lara->glossaries->waitForImport($glossaryImport, 300); // 5 
 
 // Export glossary
 $csvData = $lara->glossaries->export("gls_1A2b3C4d5E6f7G8h9I0jKl", "csv/table-uni", "en-US");
+
+// Async glossary export - returns a job ID; the result is delivered to your callback URL when ready
+$exportJob = $lara->glossaries->exportAsync(
+    "gls_1A2b3C4d5E6f7G8h9I0jKl",
+    "https://your-server.example.com/lara/export-callback",
+    "csv/table-uni",
+    "en-US"
+);
+$jobId = $exportJob->getJobId();
 
 // Get glossary terms count
 $counts = $lara->glossaries->counts("gls_1A2b3C4d5E6f7G8h9I0jKl");

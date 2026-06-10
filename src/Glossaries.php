@@ -82,12 +82,13 @@ class Glossaries
      * @param $id string
      * @param $csv string
      * @param $gzip bool
+     * @param $callbackUrl string|null
      * @return GlossaryImport
      * @throws LaraException
      */
-    public function importCsv($id, $csv, $gzip = false)
+    public function importCsv($id, $csv, $gzip = false, $callbackUrl = null)
     {
-        return $this->importCsvWithContentType($id, $csv, GlossaryFileFormat::CSV_TABLE_UNI, $gzip);
+        return $this->importCsvWithContentType($id, $csv, GlossaryFileFormat::CSV_TABLE_UNI, $gzip, $callbackUrl);
     }
 
     /**
@@ -95,15 +96,20 @@ class Glossaries
      * @param $csv string
      * @param $contentType string
      * @param $gzip bool
+     * @param $callbackUrl string|null
      * @return GlossaryImport
      * @throws LaraException
      */
-    public function importCsvWithContentType($id, $csv, $contentType, $gzip = false)
+    public function importCsvWithContentType($id, $csv, $contentType, $gzip = false, $callbackUrl = null)
     {
-        return GlossaryImport::fromResponse($this->client->post("/v2/glossaries/$id/import", [
+        $body = [
             'compression' => $gzip ? 'gzip' : null,
             'content_type' => $contentType
-        ], [
+        ];
+        if ($callbackUrl !== null) {
+            $body['callback_url'] = $callbackUrl;
+        }
+        return GlossaryImport::fromResponse($this->client->post("/v2/glossaries/$id/import", $body, [
             'csv' => $csv
         ]));
     }
@@ -146,6 +152,26 @@ class Glossaries
     public function counts($id)
     {
         return GlossaryCounts::fromResponse($this->client->get("/v2/glossaries/$id/counts"));
+    }
+
+    /**
+     * @param $id string
+     * @param $callbackUrl string
+     * @param $contentType string
+     * @param $source string|null
+     * @return GlossaryExport
+     * @throws LaraException
+     */
+    public function exportAsync($id, $callbackUrl, $contentType, $source = null)
+    {
+        $params = [
+            'callback_url' => $callbackUrl,
+            'content_type' => $contentType
+        ];
+        if ($source !== null) {
+            $params['source'] = $source;
+        }
+        return GlossaryExport::fromResponse($this->client->get("/v2/glossaries/$id/export/async", $params));
     }
 
     /**

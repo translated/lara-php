@@ -8,7 +8,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * This example demonstrates:
  * - Create, list, update, delete glossaries
  * - CSV import with status monitoring
- * - Glossary export
+ * - Glossary export (sync and async)
  * - Glossary terms count
  * - Import status checking
  */
@@ -110,24 +110,55 @@ function main() {
         echo "CSV file not found: $csvFilePath\n";
     }
 
-    // Example 4: Export functionality
+    // Example 4: CSV import with a callback URL (async notification when import completes)
+    echo "=== CSV Import with Callback URL ===\n";
+    if (file_exists($csvFilePath)) {
+        try {
+            $callbackUrl = "https://your-server.example.com/lara/import-callback";  // Replace with your endpoint
+            // Note: the callback URL must follow the gzip flag (importCsv has no callback-only overload),
+            // so pass gzip explicitly even when you don't need compression.
+            $importWithCallback = $lara->glossaries->importCsv($glossaryId, $csvFilePath, false, $callbackUrl);
+            echo "Import started with ID: " . $importWithCallback->getId() . " (callback: $callbackUrl)\n";
+
+            // You can also combine a content type + gzip + callbackUrl:
+            // $lara->glossaries->importCsvWithContentType($glossaryId, $csvFilePath, "csv/table-uni", true, $callbackUrl);
+            echo "\n";
+        } catch (LaraException $e) {
+            echo "Error starting CSV import with callback: " . $e->getMessage() . "\n\n";
+        }
+    } else {
+        echo "CSV file not found: $csvFilePath\n\n";
+    }
+
+    // Example 5: Export functionality
     echo "=== Export Functionality ===\n";
     try {
         // Export as CSV table unidirectional format
         echo "📤 Exporting as CSV table unidirectional...\n";
         $csvUniData = $lara->glossaries->export($glossaryId, "csv/table-uni", "en-US");
         echo "✅ CSV unidirectional export successful (" . strlen($csvUniData) . " bytes)\n";
-        
+
         // Save sample exports to files - replace with your desired output paths
         $exportFilePath = __DIR__ . '/exported_glossary.csv';  // Replace with actual path
         file_put_contents($exportFilePath, $csvUniData);
         echo "💾 Sample export saved to: " . basename($exportFilePath) . "\n";
+
+        // Async export - returns a job ID; the result is delivered to your callback URL when ready
+        echo "📤 Starting async export...\n";
+        $exportJob = $lara->glossaries->exportAsync(
+            $glossaryId,
+            "https://your-server.example.com/lara/export-callback",  // Replace with your actual callback URL
+            "csv/table-uni",
+            "en-US"
+        );
+        echo "✅ Async export started (Job ID: " . $exportJob->getJobId() . ")\n";
+        echo "   The export result will be delivered to your callback URL when ready.\n";
         echo "\n";
     } catch (LaraException $e) {
         echo "Error with export: " . $e->getMessage() . "\n\n";
     }
 
-    // Example 5: Glossary Terms Count
+    // Example 6: Glossary Terms Count
     echo "=== Glossary Terms Count ===\n";
     try {
         // Get detailed counts
