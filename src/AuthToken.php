@@ -10,7 +10,7 @@ class AuthToken
     public function __construct($token, $refreshToken = null)
     {
         $this->token = $token;
-        $this->refreshToken = $refreshToken;
+        $this->refreshToken = ($refreshToken === null || $refreshToken === '') ? null : $refreshToken;
     }
 
     public function getToken()
