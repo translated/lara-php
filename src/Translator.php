@@ -51,6 +51,11 @@ class Translator
 
         $this->client = new Internal\HttpClient($serverUrl, $auth);
 
+        $sessionId = $options ? $options->getSessionId() : null;
+        if ($sessionId !== null) {
+            $this->client->setSessionId($sessionId);
+        }
+
         $this->memories = new Memories($this->client);
         $this->documents = new Documents($this->client);
         $this->glossaries = new Glossaries($this->client);

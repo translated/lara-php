@@ -16,6 +16,7 @@ class HttpClient
     private $accessKey;
     private $authToken;
     private $extraHeaders = [];
+    private $sessionId;
     private $curl;
 
     /**
@@ -76,6 +77,15 @@ class HttpClient
     public function resetExtraHeader($name)
     {
         unset($this->extraHeaders[$name]);
+    }
+
+    /**
+     * @param $sessionId string|null
+     * @return void
+     */
+    public function setSessionId($sessionId)
+    {
+        $this->sessionId = $sessionId;
     }
 
     /**
@@ -688,6 +698,10 @@ class HttpClient
 
         if ($this->extraHeaders) {
             $headers = array_merge($this->extraHeaders, $headers);
+        }
+
+        if ($this->sessionId !== null && $this->sessionId !== '') {
+            $headers['X-Lara-Auth-Session-Id'] = $this->sessionId;
         }
 
         $response = $this->rawRequest($method, $path, $bodyString, $headers);
