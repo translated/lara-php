@@ -112,4 +112,81 @@ class AudioTranslator
 
         throw new LaraTimeoutException();
     }
+
+    /**
+     * @param $filepath string path to the audio file to transcribe
+     * @param $source string|null source language
+     * @param $target string target language
+     * @param $options AudioTranscriptOptions|null
+     * @return Audio
+     * @throws LaraException
+     */
+    public function uploadForTranscription($filepath, $source, $target, $options = null)
+    {
+        $filename = basename($filepath);
+
+        $s3Upload = S3UploadParams::fromResponse($this->client->get('/v2/audio/upload-url', ['filename' => $filename]));
+
+        $this->s3Client->upload($s3Upload->getUrl(), $s3Upload->getFields(), $filepath);
+
+        $data = [
+            "source" => $source,
+            "target" => $target,
+            "s3key" => $s3Upload->getFields()['key']
+        ];
+        $headers = [];
+
+        if ($options) {
+            foreach (array_filter($options->toParams()) as $key => $value) {
+                $data[$key] = $value;
+            }
+
+            if ($options->isNoTrace()) {
+                $headers['X-No-Trace'] = 'true';
+            }
+        }
+
+        return Audio::fromResponse($this->client->post("/v2/audio/translate-transcript", $data, null, $headers));
+    }
+
+    /**
+     * @param $id string
+     * @return AudioTextResult
+     * @throws LaraException
+     */
+    public function getTranslatedTranscript($id)
+    {
+        return AudioTextResult::fromResponse($this->client->get("/v2/audio/$id/translated-transcript"));
+    }
+
+    /**
+     * @param $filepath string
+     * @param $source string|null
+     * @param $target string
+     * @param $options AudioTranscriptOptions|null
+     * @return AudioTextResult
+     * @throws LaraException
+     * @throws LaraTimeoutException
+     */
+    public function translateTranscript($filepath, $source, $target, $options = null)
+    {
+        $audio = $this->uploadForTranscription($filepath, $source, $target, $options);
+
+        $maxWaitTime = 900; // 15 minutes
+        $startTime = time();
+        while (time() - $startTime < $maxWaitTime) {
+            sleep($this->pollingInterval);
+
+            $audio = $this->status($audio->getId());
+
+            if ($audio->getStatus() === AudioStatus::TRANSLATED) {
+                return $this->getTranslatedTranscript($audio->getId());
+            }
+            if ($audio->getStatus() === AudioStatus::ERROR) {
+                throw new LaraApiException(500, "AudioError", $audio->getErrorReason());
+            }
+        }
+
+        throw new LaraTimeoutException();
+    }
 }
