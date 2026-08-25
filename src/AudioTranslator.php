@@ -48,7 +48,7 @@ class AudioTranslator
         $headers = [];
 
         if ($options) {
-            foreach (array_filter($options->toParams()) as $key => $value) {
+            foreach ($options->toParams() as $key => $value) {
                 $data[$key] = $value;
             }
 

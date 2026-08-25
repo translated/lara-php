@@ -8,6 +8,7 @@ class AudioTranslateOptions
     private $noTrace = null;
     private $glossaries = null;
     private $style = null;
+    private $voiceCloning = null;
     private $voiceGender = null;
     public function __construct($options = [])
     {
@@ -19,6 +20,8 @@ class AudioTranslateOptions
             $this->setGlossaries($options['glossaries']);
         if (isset($options['style']))
             $this->setStyle($options['style']);
+        if (isset($options['voiceCloning']))
+            $this->setVoiceCloning($options['voiceCloning']);
         if (isset($options['voiceGender']))
             $this->setVoiceGender($options['voiceGender']);
     }
@@ -88,6 +91,22 @@ class AudioTranslateOptions
     }
 
     /**
+     * @param $voiceCloning bool|null
+     */
+    public function setVoiceCloning($voiceCloning)
+    {
+        $this->voiceCloning = $voiceCloning;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isVoiceCloning()
+    {
+        return $this->voiceCloning;
+    }
+
+    /**
      * @param $voiceGender string|null
      */
     public function setVoiceGender($voiceGender)
@@ -116,6 +135,9 @@ class AudioTranslateOptions
         }
         if ($this->style) {
             $params['style'] = $this->style;
+        }
+        if ($this->voiceCloning !== null) {
+            $params['voice_cloning'] = $this->voiceCloning;
         }
         if ($this->voiceGender) {
             $params['voice_gender'] = $this->voiceGender;
