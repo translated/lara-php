@@ -78,6 +78,41 @@ class Glossaries
         ]));
     }
 
+    public function getShares($id)
+    {
+        return GlossaryShares::fromResponse($this->client->get("/v2/glossaries/$id/shares"));
+    }
+
+    public function addAccountShare($id, $name = null)
+    {
+        return Glossary::fromResponse($this->client->post("/v2/glossaries/$id/shares", ['name' => $name]));
+    }
+
+    public function renameAccountShare($id, $name)
+    {
+        return Glossary::fromResponse($this->client->put("/v2/glossaries/$id/shares", ['name' => $name]));
+    }
+
+    public function revokeAccountShare($id)
+    {
+        return Glossary::fromResponse($this->client->delete("/v2/glossaries/$id/shares"));
+    }
+
+    public function addGroupShare($id, $groupId, $name = null)
+    {
+        return Glossary::fromResponse($this->client->post("/v2/glossaries/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function renameGroupShare($id, $groupId, $name)
+    {
+        return Glossary::fromResponse($this->client->put("/v2/glossaries/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function revokeGroupShare($id, $groupId)
+    {
+        return Glossary::fromResponse($this->client->delete("/v2/glossaries/$id/shares/groups/$groupId"));
+    }
+
     /**
      * @param $id string
      * @param $csv string

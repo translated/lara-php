@@ -18,7 +18,7 @@ class Memory implements \JsonSerializable
             $response['name'],
             $response['owner_id'],
             $response['collaborators_count'],
-            $response['is_personal'],
+            isset($response['is_personal']) ? (bool)$response['is_personal'] : false,
             isset($response['external_id']) ? $response['external_id'] : null,
             isset($response['secret']) ? $response['secret'] : null
         );

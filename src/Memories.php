@@ -97,6 +97,41 @@ class Memories
         return $isArray ? $memories : $memories[0];
     }
 
+    public function getShares($id)
+    {
+        return MemoryShares::fromResponse($this->client->get("/v2/memories/$id/shares"));
+    }
+
+    public function addAccountShare($id, $name = null)
+    {
+        return Memory::fromResponse($this->client->post("/v2/memories/$id/shares", ['name' => $name]));
+    }
+
+    public function renameAccountShare($id, $name)
+    {
+        return Memory::fromResponse($this->client->put("/v2/memories/$id/shares", ['name' => $name]));
+    }
+
+    public function revokeAccountShare($id)
+    {
+        return Memory::fromResponse($this->client->delete("/v2/memories/$id/shares"));
+    }
+
+    public function addGroupShare($id, $groupId, $name = null)
+    {
+        return Memory::fromResponse($this->client->post("/v2/memories/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function renameGroupShare($id, $groupId, $name)
+    {
+        return Memory::fromResponse($this->client->put("/v2/memories/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function revokeGroupShare($id, $groupId)
+    {
+        return Memory::fromResponse($this->client->delete("/v2/memories/$id/shares/groups/$groupId"));
+    }
+
     /**
      * @param $id string
      * @param $tmx string

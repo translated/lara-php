@@ -79,4 +79,39 @@ class Styleguides
         if ($content !== null) $data['content'] = $content;
         return Styleguide::fromResponse($this->client->put("/v2/styleguides/$id", $data));
     }
+
+    public function getShares($id)
+    {
+        return StyleguideShares::fromResponse($this->client->get("/v2/styleguides/$id/shares"));
+    }
+
+    public function addAccountShare($id, $name = null)
+    {
+        return Styleguide::fromResponse($this->client->post("/v2/styleguides/$id/shares", ['name' => $name]));
+    }
+
+    public function renameAccountShare($id, $name)
+    {
+        return Styleguide::fromResponse($this->client->put("/v2/styleguides/$id/shares", ['name' => $name]));
+    }
+
+    public function revokeAccountShare($id)
+    {
+        return Styleguide::fromResponse($this->client->delete("/v2/styleguides/$id/shares"));
+    }
+
+    public function addGroupShare($id, $groupId, $name = null)
+    {
+        return Styleguide::fromResponse($this->client->post("/v2/styleguides/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function renameGroupShare($id, $groupId, $name)
+    {
+        return Styleguide::fromResponse($this->client->put("/v2/styleguides/$id/shares/groups/$groupId", ['name' => $name]));
+    }
+
+    public function revokeGroupShare($id, $groupId)
+    {
+        return Styleguide::fromResponse($this->client->delete("/v2/styleguides/$id/shares/groups/$groupId"));
+    }
 }

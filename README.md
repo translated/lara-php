@@ -351,6 +351,14 @@ $deleteJob = $lara->memories->deleteTranslation(
 
 // Wait for import completion
 $completedImport = $lara->memories->waitForImport($memoryImport, 300); // 5 minutes
+
+// Share with the account or a group; shares can be renamed, listed, and revoked
+$lara->memories->addAccountShare($memory->getId(), "Team memory");
+$lara->memories->renameAccountShare($memory->getId(), "Company memory");
+$lara->memories->addGroupShare($memory->getId(), "grp_1A2b3C4d5E6f7G8h9I0jKl", "Marketing memory");
+$shares = $lara->memories->getShares($memory->getId());
+$lara->memories->revokeGroupShare($memory->getId(), "grp_1A2b3C4d5E6f7G8h9I0jKl");
+$lara->memories->revokeAccountShare($memory->getId());
 ```
 
 ### 📚 Glossary Management
@@ -383,6 +391,11 @@ $jobId = $exportJob->getJobId();
 
 // Get glossary terms count
 $counts = $lara->glossaries->counts("gls_1A2b3C4d5E6f7G8h9I0jKl");
+
+// Glossaries support the same account and group sharing workflow
+$lara->glossaries->addAccountShare($glossary->getId(), "Team glossary");
+$glossaryShares = $lara->glossaries->getShares($glossary->getId());
+$lara->glossaries->revokeAccountShare($glossary->getId());
 ```
 
 ### 📋 Styleguide Management
@@ -406,6 +419,10 @@ $styleguide = $lara->styleguides->update("stg_1A2b3C4d5E6f7G8h9I0jKl", null, "Al
 
 // Update both
 $styleguide = $lara->styleguides->update("stg_1A2b3C4d5E6f7G8h9I0jKl", "UpdatedStyleguide", "Always use informal language.");
+
+// Share a styleguide and inspect visible account, group, and user shares
+$lara->styleguides->addGroupShare($styleguide->getId(), "grp_1A2b3C4d5E6f7G8h9I0jKl", "Marketing styleguide");
+$styleguideShares = $lara->styleguides->getShares($styleguide->getId());
 
 // Delete styleguide
 $styleguide = $lara->styleguides->delete("stg_1A2b3C4d5E6f7G8h9I0jKl");

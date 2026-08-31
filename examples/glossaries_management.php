@@ -11,6 +11,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * - Glossary export (sync and async)
  * - Glossary terms count
  * - Import status checking
+ * - Sharing a glossary with the account or a group (add, rename, list, revoke)
  */
 
 use Lara\LaraCredentials;
@@ -183,6 +184,55 @@ function main() {
         echo "\n";
     } catch (LaraException $e) {
         echo "Error getting glossary terms count: " . $e->getMessage() . "\n\n";
+    }
+
+    // Example 7: Glossary sharing
+    // Sharing requires a multi-user account and the appropriate role (account owner for
+    // account-wide shares, owner/admin for group shares). Each call returns the shared
+    // glossary, whose name reflects the shared copy's name and sharedAt the share time.
+    echo "=== Glossary Sharing ===\n";
+    try {
+        // Share with the whole account/team (the optional second argument names the shared copy)
+        $teamShare = $lara->glossaries->addAccountShare($glossaryId, "Shared with the team");
+        echo "🤝 Shared with the account as: '" . $teamShare->getName() . "' (shared at " . $teamShare->getSharedAt() . ")\n";
+
+        // Rename the account/team share
+        $renamedTeamShare = $lara->glossaries->renameAccountShare($glossaryId, "Team glossary");
+        echo "📝 Renamed account share to: '" . $renamedTeamShare->getName() . "'\n";
+
+        // List every share visible to the caller: the account share, group shares and user shares
+        $shares = $lara->glossaries->getShares($glossaryId);
+        if ($shares->getAccount() !== null) {
+            echo "👥 Account share '" . $shares->getAccount()->getShareName() . "' (" . $shares->getAccount()->getPermissions() . ")\n";
+        }
+        foreach ($shares->getGroups() as $group) {
+            echo "👥 Group " . $group->getName() . ": '" . $group->getShareName() . "' (" . $group->getPermissions() . ")\n";
+        }
+        foreach ($shares->getUsers() as $user) {
+            echo "👤 User " . $user->getName() . ": '" . $user->getShareName() . "' (" . $user->getPermissions() . ")\n";
+        }
+
+        // Revoke the account/team share
+        $lara->glossaries->revokeAccountShare($glossaryId);
+        echo "🚫 Revoked the account share\n";
+
+        // Group shares work the same way, addressed by a group ID (grp_...)
+        $groupId = getenv("LARA_GROUP_ID");  // Replace with an actual group ID
+        if ($groupId) {
+            $groupShare = $lara->glossaries->addGroupShare($glossaryId, $groupId, "Shared with the group");
+            echo "🤝 Shared with group " . $groupId . " as: '" . $groupShare->getName() . "'\n";
+
+            $lara->glossaries->renameGroupShare($glossaryId, $groupId, "Marketing group");
+            echo "📝 Renamed the group share\n";
+
+            $lara->glossaries->revokeGroupShare($glossaryId, $groupId);
+            echo "🚫 Revoked the group share\n";
+        } else {
+            echo "Set LARA_GROUP_ID to try the group sharing methods.\n";
+        }
+        echo "\n";
+    } catch (LaraException $e) {
+        echo "Error sharing glossary: " . $e->getMessage() . "\n\n";
     }
 
     // Cleanup
