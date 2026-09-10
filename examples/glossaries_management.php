@@ -120,9 +120,6 @@ function main() {
                 new \Lara\GlossaryImportOptions(['callbackUrl' => $callbackUrl]));
             echo "Import started with ID: " . $importWithCallback->getId() . " (callback: $callbackUrl)\n";
 
-            // You can also combine a content type + gzip + callbackUrl:
-            // $lara->glossaries->importFile($glossaryId, $csvFilePath . '.gz',
-            //     new \Lara\GlossaryImportOptions(['contentType' => 'csv/table-uni', 'gzip' => true, 'callbackUrl' => $callbackUrl]));
             echo "\n";
         } catch (LaraException $e) {
             echo "Error starting CSV import with callback: " . $e->getMessage() . "\n\n";

@@ -316,22 +316,11 @@ $memoryImport = $lara->memories->addTranslation(
 $tmxFilePath = "/path/to/your/memory.tmx";  // Replace with actual TMX file path
 $memoryImport = $lara->memories->importTmx("mem_1A2b3C4d5E6f7G8h9I0jKl", $tmxFilePath);
 
-// TMX import with gzip compression
-$memoryImport = $lara->memories->importTmx("mem_1A2b3C4d5E6f7G8h9I0jKl", $tmxFilePath, true);
-
 // TMX import with a callback URL (notified when the import completes)
 $memoryImport = $lara->memories->importTmx(
     "mem_1A2b3C4d5E6f7G8h9I0jKl",
     $tmxFilePath,
-    false,
-    "https://your-server.example.com/lara/import-callback"
-);
-
-// TMX import with both gzip compression and a callback URL
-$memoryImport = $lara->memories->importTmx(
-    "mem_1A2b3C4d5E6f7G8h9I0jKl",
-    $tmxFilePath,
-    true,
+    false, // uncompressed input
     "https://your-server.example.com/lara/import-callback"
 );
 
@@ -372,7 +361,7 @@ $glossaryFilePath = "/path/to/your/glossary.csv";
 $glossaryImport = $lara->glossaries->importFile("gls_1A2b3C4d5E6f7G8h9I0jKl", $glossaryFilePath,
     new \Lara\GlossaryImportOptions(['contentType' => \Lara\GlossaryFileFormat::CSV_TABLE_UNI]));
 
-// Options default to unidirectional CSV and gzip=false. gzip marks an already compressed file.
+// Options default to unidirectional CSV.
 // A callback can be supplied on its own:
 // $lara->glossaries->importFile($glossary->getId(), $glossaryFilePath,
 //     new \Lara\GlossaryImportOptions(['callbackUrl' => $callbackUrl]));

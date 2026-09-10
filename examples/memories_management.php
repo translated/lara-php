@@ -137,11 +137,9 @@ function main() {
     if (file_exists($tmxFilePath)) {
         try {
             $callbackUrl = "https://your-server.example.com/lara/import-callback";  // Replace with your endpoint
-            $tmxImportWithCallback = $lara->memories->importTmx($memoryId, $tmxFilePath, false, $callbackUrl);
+            $tmxImportWithCallback = $lara->memories->importTmx($memoryId, $tmxFilePath, /* uncompressed input */ false, $callbackUrl);
             echo "Import started with ID: " . $tmxImportWithCallback->getId() . " (callback: $callbackUrl)\n";
 
-            // You can also combine gzip + callbackUrl:
-            // $lara->memories->importTmx($memoryId, $tmxFilePath, true, $callbackUrl);
             echo "\n";
         } catch (LaraException $e) {
             echo "Error starting TMX import with callback: " . $e->getMessage() . "\n\n";
