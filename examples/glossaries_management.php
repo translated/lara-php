@@ -86,7 +86,7 @@ function main() {
     if (file_exists($csvFilePath)) {
         try {
         echo "Importing CSV file: " . basename($csvFilePath) . "\n";
-        $import = $lara->glossaries->importCsv($glossaryId, $csvFilePath);
+        $import = $lara->glossaries->importFile($glossaryId, $csvFilePath);
         echo "Import started with ID: " . $import->getId() . "\n";
         echo "Initial progress: " . ($import->getProgress() * 100) . "%\n";
 
@@ -116,13 +116,13 @@ function main() {
     if (file_exists($csvFilePath)) {
         try {
             $callbackUrl = "https://your-server.example.com/lara/import-callback";  // Replace with your endpoint
-            // Note: the callback URL must follow the gzip flag (importCsv has no callback-only overload),
-            // so pass gzip explicitly even when you don't need compression.
-            $importWithCallback = $lara->glossaries->importCsv($glossaryId, $csvFilePath, false, $callbackUrl);
+            $importWithCallback = $lara->glossaries->importFile($glossaryId, $csvFilePath,
+                new \Lara\GlossaryImportOptions(['callbackUrl' => $callbackUrl]));
             echo "Import started with ID: " . $importWithCallback->getId() . " (callback: $callbackUrl)\n";
 
             // You can also combine a content type + gzip + callbackUrl:
-            // $lara->glossaries->importCsvWithContentType($glossaryId, $csvFilePath, "csv/table-uni", true, $callbackUrl);
+            // $lara->glossaries->importFile($glossaryId, $csvFilePath . '.gz',
+            //     new \Lara\GlossaryImportOptions(['contentType' => 'csv/table-uni', 'gzip' => true, 'callbackUrl' => $callbackUrl]));
             echo "\n";
         } catch (LaraException $e) {
             echo "Error starting CSV import with callback: " . $e->getMessage() . "\n\n";

@@ -367,9 +367,15 @@ $lara->memories->revokeAccountShare($memory->getId());
 // Create glossary
 $glossary = $lara->glossaries->create("MyGlossary");
 
-// Import CSV from file
-$csvFilePath = "/path/to/your/glossary.csv";  // Replace with actual CSV file path
-$glossaryImport = $lara->glossaries->importCsv("gls_1A2b3C4d5E6f7G8h9I0jKl", $csvFilePath);
+// Import a glossary file (use \Lara\GlossaryFileFormat::TBX for TBX files)
+$glossaryFilePath = "/path/to/your/glossary.csv";
+$glossaryImport = $lara->glossaries->importFile("gls_1A2b3C4d5E6f7G8h9I0jKl", $glossaryFilePath,
+    new \Lara\GlossaryImportOptions(['contentType' => \Lara\GlossaryFileFormat::CSV_TABLE_UNI]));
+
+// Options default to unidirectional CSV and gzip=false. gzip marks an already compressed file.
+// A callback can be supplied on its own:
+// $lara->glossaries->importFile($glossary->getId(), $glossaryFilePath,
+//     new \Lara\GlossaryImportOptions(['callbackUrl' => $callbackUrl]));
 
 // Check import status
 $importStatus = $lara->glossaries->getImportStatus($glossaryImport->getId());

@@ -115,15 +115,44 @@ class Glossaries
 
     /**
      * @param $id string
+     * @param $file string
+     * @param $options GlossaryImportOptions|null
+     * @return GlossaryImport
+     * @throws LaraException
+     */
+    public function importFile($id, $file, $options = null)
+    {
+        if ($options === null) {
+            $options = new GlossaryImportOptions();
+        }
+        $body = [
+            'compression' => $options->getGzip() ? 'gzip' : null,
+            'content_type' => $options->getContentType()
+        ];
+        $callbackUrl = $options->getCallbackUrl();
+        if ($callbackUrl !== null) {
+            $body['callback_url'] = $callbackUrl;
+        }
+        return GlossaryImport::fromResponse($this->client->post("/v2/glossaries/$id/import", $body, [
+            'csv' => $file
+        ]));
+    }
+
+    /**
+     * @param $id string
      * @param $csv string
      * @param $gzip bool
      * @param $callbackUrl string|null
      * @return GlossaryImport
      * @throws LaraException
+     * @deprecated Use importFile() instead.
      */
     public function importCsv($id, $csv, $gzip = false, $callbackUrl = null)
     {
-        return $this->importCsvWithContentType($id, $csv, GlossaryFileFormat::CSV_TABLE_UNI, $gzip, $callbackUrl);
+        return $this->importFile($id, $csv, new GlossaryImportOptions([
+            'gzip' => $gzip,
+            'callbackUrl' => $callbackUrl
+        ]));
     }
 
     /**
@@ -134,18 +163,17 @@ class Glossaries
      * @param $callbackUrl string|null
      * @return GlossaryImport
      * @throws LaraException
+     * @deprecated Use importFile() instead.
      */
     public function importCsvWithContentType($id, $csv, $contentType, $gzip = false, $callbackUrl = null)
     {
-        $body = [
-            'compression' => $gzip ? 'gzip' : null,
-            'content_type' => $contentType
-        ];
-        if ($callbackUrl !== null) {
-            $body['callback_url'] = $callbackUrl;
+        if (!in_array($contentType, [GlossaryFileFormat::CSV_TABLE_UNI, GlossaryFileFormat::CSV_TABLE_MULTI], true)) {
+            throw new \InvalidArgumentException("importCsvWithContentType only supports CSV formats; use importFile for TBX files.");
         }
-        return GlossaryImport::fromResponse($this->client->post("/v2/glossaries/$id/import", $body, [
-            'csv' => $csv
+        return $this->importFile($id, $csv, new GlossaryImportOptions([
+            'contentType' => $contentType,
+            'gzip' => $gzip,
+            'callbackUrl' => $callbackUrl
         ]));
     }
 

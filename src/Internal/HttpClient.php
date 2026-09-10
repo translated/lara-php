@@ -470,7 +470,9 @@ class HttpClient
                     if (!file_exists($filePath)) {
                         throw new LaraApiException(400, 'FileNotFound', "File $filePath not found");
                     }
-                    $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+                    $mimeType = strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'tbx'
+                        ? 'application/xml'
+                        : (mime_content_type($filePath) ?: 'application/octet-stream');
                     $requestBody[$key] = new CURLFile(realpath($filePath), $mimeType, basename($filePath));
                 }
             } else {
@@ -544,6 +546,14 @@ class HttpClient
                 $this->throwApiException($statusCode, json_decode($errorBody, true));
             }
             return $stream;
+        }
+
+        $contentType = curl_getinfo($this->curl, CURLINFO_CONTENT_TYPE) ?: '';
+        if (
+            200 <= $statusCode && $statusCode < 300
+            && (stripos($contentType, 'text/csv') !== false || stripos($contentType, 'application/xml') !== false)
+        ) {
+            return $result;
         }
 
         $responseBody = json_decode($result, true);
