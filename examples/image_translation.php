@@ -9,6 +9,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
  * - Basic image translation
  * - Advanced options with memories and glossaries
  * - Extracting and translating text from an image
+ * - Editing translations and rendering with classic and generative models
  */
 
 use Lara\LaraCredentials;
@@ -16,6 +17,8 @@ use Lara\Translator;
 use Lara\LaraException;
 use Lara\ImageTranslationOptions;
 use Lara\ImageTextTranslationOptions;
+use Lara\ImageLayoutParagraph;
+use Lara\ImageParagraph;
 
 function main() {
     // All examples use environment variables for credentials, so set them first:
@@ -45,7 +48,7 @@ function main() {
 
     try {
         $translatedStream = $lara->images->translate($sampleFilePath, $sourceLang, $targetLang, new ImageTranslationOptions([
-            'model' => 'overlay'
+            'model' => 'generative_fast'
         ]));
 
         $outputPath = __DIR__ . '/sample_image_translated.png';
@@ -83,25 +86,62 @@ function main() {
         echo "Error in advanced translation: " . $e->getMessage() . "\n\n";
     }
 
-    // Example 3: Extract and translate text from an image
-    echo "=== Extract and Translate Text ===\n";
+    // Example 3: Extract text with layout, edit a translation, and render it
+    echo "=== Extract, Edit, and Render Translations ===\n";
     try {
         $results = $lara->images->translateText($sampleFilePath, $sourceLang, $targetLang, new ImageTextTranslationOptions([
-            'adaptTo' => ['mem_1A2b3C4d5E6f7G8h9I0jKl'],       // Replace with actual memory IDs
-            'glossaries' => ['gls_1A2b3C4d5E6f7G8h9I0jKl'],    // Replace with actual glossary IDs
-            'style' => 'faithful'
+            'style' => 'faithful',
+            'includeLayout' => true
         ]));
 
+        $paragraphs = $results->getParagraphs();
         echo "Extract and translate completed\n";
-        echo "Found " . count($results) . " text blocks\n";
+        echo "Found " . count($paragraphs) . " text blocks\n";
 
-        foreach ($results as $index => $result) {
+        foreach ($paragraphs as $index => $result) {
             echo "\nText Block " . ($index + 1) . ":\n";
             echo "Original: " . $result->getText() . "\n";
             echo "Translated: " . $result->getTranslation() . "\n";
         }
+
+        if (empty($paragraphs)) {
+            echo "No text found to render.\n";
+            return;
+        }
+
+        // includeLayout=true guarantees complete layout metadata on every paragraph.
+        $first = $paragraphs[0];
+        $paragraphs[0] = new ImageLayoutParagraph(
+            $first->getText(), "Hallo Welt!", $first->getBbox(),
+            $first->getLinesBboxes(), $first->getTextInfo(), $first->getAlignment(),
+            $first->getAdaptedToMatches(), $first->getGlossariesMatches()
+        );
+
+        $classicStream = $lara->images->renderTranslated(
+            $sampleFilePath, $results->getSourceLanguage(), $targetLang, $paragraphs, "overlay"
+        );
+        $classicPath = __DIR__ . '/edited_image_overlay.png';
+        $classicOutput = fopen($classicPath, 'wb');
+        stream_copy_to_stream($classicStream, $classicOutput);
+        fclose($classicOutput);
+        fclose($classicStream);
+        echo "Edited image saved to: " . basename($classicPath) . "\n";
+
+        // Generative models accept text-only paragraphs. Omit model for generative_fast.
+        $textOnlyParagraphs = array_map(function ($paragraph) {
+            return new ImageParagraph($paragraph->getText(), $paragraph->getTranslation());
+        }, $paragraphs);
+        $generativeStream = $lara->images->renderTranslated(
+            $sampleFilePath, null, $targetLang, $textOnlyParagraphs
+        );
+        $generativePath = __DIR__ . '/edited_image_generative.png';
+        $generativeOutput = fopen($generativePath, 'wb');
+        stream_copy_to_stream($generativeStream, $generativeOutput);
+        fclose($generativeOutput);
+        fclose($generativeStream);
+        echo "Edited image saved to: " . basename($generativePath) . "\n";
     } catch (LaraException $e) {
-        echo "Error extracting and translating text: " . $e->getMessage() . "\n";
+        echo "Error extracting, editing, or rendering translations: " . $e->getMessage() . "\n";
     }
 }
 

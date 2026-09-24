@@ -8,6 +8,8 @@ class ImageTextTranslationOptions
     private $glossaries = null;
     private $style = null;
     private $noTrace = null;
+    private $verbose = null;
+    private $includeLayout = null;
 
     public function __construct($options = [])
     {
@@ -19,6 +21,10 @@ class ImageTextTranslationOptions
             $this->setStyle($options['style']);
         if (isset($options['noTrace']))
             $this->setNoTrace($options['noTrace']);
+        if (isset($options['verbose']))
+            $this->setVerbose($options['verbose']);
+        if (isset($options['includeLayout']))
+            $this->setIncludeLayout($options['includeLayout']);
     }
 
     /**
@@ -83,5 +89,39 @@ class ImageTextTranslationOptions
     public function isNoTrace()
     {
         return $this->noTrace;
+    }
+
+    /**
+     * Request memory and glossary matches independently of layout metadata.
+     * @param $verbose bool|null
+     */
+    public function setVerbose($verbose)
+    {
+        $this->verbose = $verbose;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function isVerbose()
+    {
+        return $this->verbose;
+    }
+
+    /**
+     * Include complete layout metadata on every returned paragraph when true.
+     * @param $includeLayout bool|null
+     */
+    public function setIncludeLayout($includeLayout)
+    {
+        $this->includeLayout = $includeLayout;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getIncludeLayout()
+    {
+        return $this->includeLayout;
     }
 }

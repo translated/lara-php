@@ -99,6 +99,7 @@ php document_translation.php
     - Basic image translation
     - Advanced options with memories and glossaries
     - Extract and translate text from an image
+    - Edit translations and render them with layout or text-only paragraphs
 
 ```bash
 cd examples
@@ -273,19 +274,76 @@ $fileStream = $lara->documents->download($document->getId(), $downloadOptions);
 ```php
 use Lara\ImageTranslationOptions;
 use Lara\ImageTextTranslationOptions;
+use Lara\ImageLayoutParagraph;
+use Lara\ImageParagraph;
+
+$imagePath = "/path/to/your/image.png";
 
 // Translate image and receive a translated image stream
-$translatedImageStream = $lara->images->translate("/path/to/your/image.png", "en", "fr", new ImageTranslationOptions([
-    'model' => 'inpainting',
+$translatedImageStream = $lara->images->translate($imagePath, "en", "fr", new ImageTranslationOptions([
+    'model' => 'generative_fast',
     'style' => 'faithful'
 ]));
+$output = fopen("translated.png", "wb");
+stream_copy_to_stream($translatedImageStream, $output);
+fclose($output);
+fclose($translatedImageStream);
 
-// Extract and translate text blocks from an image
-$textBlocks = $lara->images->translateText("/path/to/your/image.png", "en", "fr", new ImageTextTranslationOptions([
-    'adaptTo' => ["mem_1A2b3C4d5E6f7G8h9I0jKl"],
-    'glossaries' => ["gls_1A2b3C4d5E6f7G8h9I0jKl"],
+// Request complete layout metadata for classic rendering.
+$textBlocks = $lara->images->translateText($imagePath, "en", "fr", new ImageTextTranslationOptions([
+    'includeLayout' => true
 ]));
+$paragraphs = $textBlocks->getParagraphs();
+
+if (!empty($paragraphs)) {
+    // includeLayout=true guarantees complete geometry and text styling.
+    $first = $paragraphs[0];
+    $paragraphs[0] = new ImageLayoutParagraph(
+        $first->getText(), "Bonjour le monde !", $first->getBbox(),
+        $first->getLinesBboxes(), $first->getTextInfo(), $first->getAlignment(),
+        $first->getAdaptedToMatches(), $first->getGlossariesMatches()
+    );
+
+    $renderedImage = $lara->images->renderTranslated(
+        $imagePath, $textBlocks->getSourceLanguage(), "fr", $paragraphs, "overlay"
+    );
+    $output = fopen("edited-overlay.png", "wb");
+    stream_copy_to_stream($renderedImage, $output);
+    fclose($output);
+    fclose($renderedImage);
+
+    // Generative models accept text-only paragraphs. Omit model for generative_fast.
+    $textOnlyParagraphs = array_map(function ($paragraph) {
+        return new ImageParagraph($paragraph->getText(), $paragraph->getTranslation());
+    }, $paragraphs);
+    $renderedImage = $lara->images->renderTranslated($imagePath, null, "fr", $textOnlyParagraphs);
+    $output = fopen("edited-generative.png", "wb");
+    stream_copy_to_stream($renderedImage, $output);
+    fclose($output);
+    fclose($renderedImage);
+}
 ```
+
+`renderTranslated($filePath, $source, $target, $paragraphs, $model = null, $noTrace = false)`
+renders supplied translations without translating them again. Pass `null` for the source language to omit it.
+Supported models are `overlay`, `inpainting`, `generative`, and `generative_fast`; omitting the model uses
+the API default, `generative_fast`. Set `$noTrace` to `true` to disable request tracing. As with `translate`,
+the returned value is a stream resource that the caller must close.
+
+`overlay` and `inpainting` require every entry to be an `ImageLayoutParagraph`, with `bbox`, `linesBboxes`,
+`textInfo`, and `alignment`. Generative models accept both `ImageParagraph` and `ImageLayoutParagraph`.
+The API validates paragraph contents; incomplete layout is invalid. Memory and glossary matches are
+excluded from rendering requests.
+
+`includeLayout` can be set in the options constructor or with `setIncludeLayout(true)`. When it is `true`,
+every entry is an `ImageLayoutParagraph` containing the complete metadata required by classic rendering.
+Omitting the option, or setting it to `false` or `null`, preserves the text-only response.
+The independent `verbose` option (or `setVerbose(true)`) requests memory and glossary matches.
+
+`ImageBBox` exposes `getTopLeft()`, `getTopRight()`, `getBottomRight()`, and `getBottomLeft()` integer
+coordinate pairs (`[x, y]`). `ImageTextInfo` exposes direction (`ltr`, `rtl`, or `ttb`), text color, and
+background color through getters. Alignment is `left`, `center`, or `right`. The SDK serializes layout
+using the API's snake_case field names.
 
 ### 🧠 Memory Management
 

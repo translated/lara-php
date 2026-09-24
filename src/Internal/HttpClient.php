@@ -540,12 +540,13 @@ class HttpClient
 
         if ($returnStream) {
             rewind($stream);
-            if ($statusCode < 200 || $statusCode >= 300) {
-                $errorBody = stream_get_contents($stream);
-                fclose($stream);
-                $this->throwApiException($statusCode, json_decode($errorBody, true));
+            if (200 <= $statusCode && $statusCode < 300) {
+                return $stream;
             }
-            return $stream;
+
+            // Close failed response streams before the shared error and retry handling.
+            $result = stream_get_contents($stream);
+            fclose($stream);
         }
 
         $contentType = curl_getinfo($this->curl, CURLINFO_CONTENT_TYPE) ?: '';

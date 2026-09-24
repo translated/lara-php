@@ -10,6 +10,7 @@ class ImageParagraph
     private $glossariesMatches;
 
     /**
+     * Responses with complete layout metadata produce ImageLayoutParagraph instances.
      * @param array $response
      * @return ImageParagraph
      */
@@ -27,6 +28,21 @@ class ImageParagraph
             $glossariesMatches = array_map(function ($m) {
                 return NGGlossaryMatch::fromResponse($m);
             }, $response['glossaries_matches']);
+        }
+
+        if (isset($response['bbox'], $response['lines_bboxes'], $response['text_info'], $response['alignment'])) {
+            return new ImageLayoutParagraph(
+                $response['text'],
+                $response['translation'],
+                ImageBBox::fromResponse($response['bbox']),
+                array_map(function ($bbox) {
+                    return ImageBBox::fromResponse($bbox);
+                }, $response['lines_bboxes']),
+                ImageTextInfo::fromResponse($response['text_info']),
+                $response['alignment'],
+                $adaptedToMatches,
+                $glossariesMatches
+            );
         }
 
         return new ImageParagraph(

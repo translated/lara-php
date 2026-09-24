@@ -66,6 +66,8 @@ class ImageTextResult
     }
 
     /**
+     * When includeLayout is true, every entry is an ImageLayoutParagraph with
+     * the complete metadata required by classic rendering models.
      * @return ImageParagraph[]
      */
     public function getParagraphs()
