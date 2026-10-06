@@ -111,13 +111,13 @@ function main() {
         // List every share visible to the caller: the account share, group shares and user shares
         $shares = $lara->styleguides->getShares($styleguideId);
         if ($shares->getAccount() !== null) {
-            echo "👥 Account share '" . $shares->getAccount()->getShareName() . "' (" . $shares->getAccount()->getPermissions() . ")\n";
+            echo "👥 Account share '" . $shares->getAccount()->getShareName() . "' (" . $shares->getAccount()->getPermissionMask() . ")\n";
         }
         foreach ($shares->getGroups() as $group) {
-            echo "👥 Group " . $group->getName() . ": '" . $group->getShareName() . "' (" . $group->getPermissions() . ")\n";
+            echo "👥 Group " . $group->getName() . ": '" . $group->getShareName() . "' (" . $group->getPermissionMask() . ")\n";
         }
         foreach ($shares->getUsers() as $user) {
-            echo "👤 User " . $user->getName() . ": '" . $user->getShareName() . "' (" . $user->getPermissions() . ")\n";
+            echo "👤 User " . $user->getName() . ": '" . $user->getShareName() . "' (" . $user->getPermissionMask() . ")\n";
         }
 
         // Revoke the account/team share

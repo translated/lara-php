@@ -20,7 +20,8 @@ class Memory implements \JsonSerializable
             $response['collaborators_count'],
             isset($response['is_personal']) ? (bool)$response['is_personal'] : false,
             isset($response['external_id']) ? $response['external_id'] : null,
-            isset($response['secret']) ? $response['secret'] : null
+            isset($response['secret']) ? $response['secret'] : null,
+            isset($response['permission_mask']) ? $response['permission_mask'] : null
         );
     }
 
@@ -34,6 +35,7 @@ class Memory implements \JsonSerializable
     private $externalId;
     private $secret;
     private $isPersonal;
+    private $permissionMask;
 
     /**
      * @param $id string
@@ -46,9 +48,10 @@ class Memory implements \JsonSerializable
      * @param $isPersonal bool
      * @param $externalId string|null
      * @param $secret string|null
+     * @param $permissionMask string|null
      */
     public function __construct($id, $createdAt, $updatedAt, $sharedAt, $name, $ownerId, $collaboratorsCount,
-                                $isPersonal, $externalId = null, $secret = null)
+                                $isPersonal, $externalId = null, $secret = null, $permissionMask = null)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
@@ -58,6 +61,7 @@ class Memory implements \JsonSerializable
         $this->ownerId = $ownerId;
         $this->collaboratorsCount = $collaboratorsCount;
         $this->isPersonal = $isPersonal;
+        $this->permissionMask = $permissionMask;
         $this->externalId = $externalId;
         $this->secret = $secret;
     }
@@ -140,6 +144,16 @@ class Memory implements \JsonSerializable
     public function getIsPersonal()
     {
         return $this->isPersonal;
+    }
+
+    /**
+     * Effective combined mask in GET list/detail; selected share's stored mask in GET /shares.
+     * Null when omitted, including non-GET responses.
+     * @return string|null
+     */
+    public function getPermissionMask()
+    {
+        return $this->permissionMask;
     }
 
     public function __toString()

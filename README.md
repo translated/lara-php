@@ -533,6 +533,14 @@ $languages = $lara->getLanguages();
 echo "Supported languages: " . implode(', ', $languages) . PHP_EOL;
 ```
 
+### Asset permissions
+
+Memories, glossaries, styleguides, and their share entries expose `getPermissionMask()` from the API's `permission_mask` field. Masks use read (`r`), write (`w`), export (`e`), and share (`s`) positions; `-` means absent. Supported masks are `r---`, `rw--`, `r-e-`, `r--s`, `rwe-`, `rw-s`, `r-es`, and `rwes`.
+
+On memory, glossary, and styleguide resources, `getPermissionMask()` is optional and is `null` when omitted by the API, including POST, PUT, and DELETE resource responses. GET list and detail responses report the combined effective mask from the caller's applicable shares. Resources embedded in GET `/shares` responses report the selected share's stored mask; individual share entries report their own required stored mask.
+
+The legacy `permissions` field and its read/write compatibility API have been removed. Use `getPermissionMask()` to inspect the read, write, export, and share bits. Share-entry masks are required, matching the service contract. Resource masks remain optional.
+
 ## ⚙️ Configuration
 
 ### Error Handling
