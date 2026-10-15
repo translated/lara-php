@@ -16,7 +16,6 @@ class Glossary implements \JsonSerializable
             $response['updated_at'],
             $response['name'],
             $response['owner_id'],
-            isset($response['is_personal']) ? (bool)$response['is_personal'] : false,
             $response['shared_at'],
             isset($response['permission_mask']) ? $response['permission_mask'] : null
         );
@@ -28,7 +27,6 @@ class Glossary implements \JsonSerializable
     private $sharedAt;
     private $name;
     private $ownerId;
-    private $isPersonal;
     private $permissionMask;
 
     /**
@@ -37,11 +35,10 @@ class Glossary implements \JsonSerializable
      * @param $updatedAt string
      * @param $name string
      * @param $ownerId string
-     * @param $isPersonal bool
      * @param $sharedAt string
      * @param $permissionMask string|null
      */
-    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId, $isPersonal, $sharedAt, $permissionMask = null)
+    public function __construct($id, $createdAt, $updatedAt, $name, $ownerId, $sharedAt, $permissionMask = null)
     {
         $this->id = $id;
         $this->createdAt = $createdAt;
@@ -49,7 +46,6 @@ class Glossary implements \JsonSerializable
         $this->sharedAt = $sharedAt;
         $this->name = $name;
         $this->ownerId = $ownerId;
-        $this->isPersonal = $isPersonal;
         $this->permissionMask = $permissionMask;
     }
 
@@ -96,14 +92,6 @@ class Glossary implements \JsonSerializable
     public function getOwnerId()
     {
         return $this->ownerId;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getIsPersonal()
-    {
-        return $this->isPersonal;
     }
 
     /**
