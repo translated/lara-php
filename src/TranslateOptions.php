@@ -19,6 +19,7 @@ class TranslateOptions
     private $style = null;
     private $headers = null;
     private $reasoning = null;
+    private $imageContext = null;
     private $metadata = null;
     private $profanitiesDetect = null;
     private $profanitiesHandling = null;
@@ -58,6 +59,8 @@ class TranslateOptions
             $this->setHeaders($options['headers']);
         if (isset($options['reasoning']))
             $this->setReasoning($options['reasoning']);
+        if (isset($options['imageContext']))
+            $this->setImageContext($options['imageContext']);
         if (isset($options['metadata']))
             $this->setMetadata($options['metadata']);
         if (isset($options['profanitiesDetect']))
@@ -307,6 +310,22 @@ class TranslateOptions
     public function isReasoning()
     {
         return $this->reasoning;
+    }
+
+    /**
+     * One image object or a single-element array. Non-empty context requires reasoning=true.
+     * Image validation is performed by the API; [] preserves text-only translation.
+     * @param $imageContext ImageContext|ImageContext[]|array|null
+     */
+    public function setImageContext($imageContext)
+    {
+        $this->imageContext = $imageContext;
+    }
+
+    /** @return ImageContext|ImageContext[]|array|null */
+    public function getImageContext()
+    {
+        return $this->imageContext;
     }
 
     /**

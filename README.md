@@ -208,6 +208,47 @@ $options = new TranslateOptions([
 $result = $lara->translate("Hello", "en-US", "fr-FR", $options);
 ```
 
+#### Text Translation with Image Context
+
+Pass `imageContext` to use an image as visual context for translating text, with reasoning enabled:
+
+```php
+$options = new \Lara\TranslateOptions([
+    'reasoning' => true,
+    'imageContext' => new \Lara\ImageContext('https://example.com/storefront.png')
+]);
+$result = $lara->translate('Open', 'en-US', 'it-IT', $options);
+echo $result->getTranslation();
+
+if ($result->getWarnings() !== null && $result->getWarnings()->getReasoning() !== null) {
+    foreach ($result->getWarnings()->getReasoning()->getWarnings() as $warning) {
+        echo $warning->getCode() . ': ' . $warning->getMessage() . PHP_EOL;
+    }
+}
+```
+
+You can also supply a single-element array or an inline image:
+
+```php
+$encoded = base64_encode(file_get_contents('storefront.png'));
+$options->setImageContext([new \Lara\ImageContext('data:image/png;base64,' . $encoded)]);
+// Associative arrays such as ['url' => 'https://example.com/storefront.png'] are also accepted.
+```
+
+The API accepts at most one image: an HTTPS URL or a base64 PNG, JPEG or WebP data
+URL. Inline images must match their declared MIME type and contain at most 5 MiB
+of decoded data; the serialized request body is limited to 16 MiB. Omitting
+`imageContext` or passing `[]` preserves text-only behavior. Validation is performed
+by the API, which returns 400 for invalid input and 413 for size violations.
+
+If the image cannot be used, the server may retry the entire request with reasoning
+without images. The result then includes an `image_context_unavailable` warning
+under `warnings.reasoning.warnings` in the API response, exposed by the typed warning
+models shown above. `warnings.reasoning.applied` is `true` when reasoning succeeds
+without images, or `false` (with an error containing `statusCode` and `message`) when
+the server falls back to standard translation. Reference retrieval and prosa failures
+are available under `warnings.references` and `warnings.prosa`.
+
 #### Quality Estimation
 
 Use `qualityEstimation()` to score how well a translation matches its source. Pass a single sentence/translation pair to get a single result, or two parallel arrays to get one result per pair.

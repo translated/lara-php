@@ -40,7 +40,8 @@ class TextResult implements \JsonSerializable
             isset($response["adapted_to_matches"]) ? $response["adapted_to_matches"] : null,
             isset($response["glossaries_matches"]) ? $response["glossaries_matches"] : null,
             $profanities,
-            $styleguideResults
+            $styleguideResults,
+            isset($response["warnings"]) ? TextWarnings::fromResponse($response["warnings"]) : null
         );
     }
 
@@ -53,6 +54,7 @@ class TextResult implements \JsonSerializable
     private $glossariesMatches;
     private $profanities;
     private $styleguideResults;
+    private $warnings;
 
     /**
      * @param $contentType string
@@ -64,8 +66,9 @@ class TextResult implements \JsonSerializable
      * @param $glossariesMatches NGGlossaryMatch[]|NGGlossaryMatch[][]|null
      * @param $profanities ProfanitiesResult|null
      * @param $styleguideResults StyleguideResults|null
+     * @param $warnings TextWarnings|null
      */
-    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null, $styleguideResults = null)
+    public function __construct($contentType, $sourceLanguage, $translation, $adaptedTo = null, $glossaries = null, $adaptedToMatches = null, $glossariesMatches = null, $profanities = null, $styleguideResults = null, $warnings = null)
     {
         $this->contentType = $contentType;
         $this->sourceLanguage = $sourceLanguage;
@@ -76,6 +79,13 @@ class TextResult implements \JsonSerializable
         $this->glossariesMatches = $glossariesMatches;
         $this->profanities = $profanities;
         $this->styleguideResults = $styleguideResults;
+        $this->warnings = $warnings;
+    }
+
+    /** @return TextWarnings|null */
+    public function getWarnings()
+    {
+        return $this->warnings;
     }
 
     /**
