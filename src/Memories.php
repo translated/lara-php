@@ -17,6 +17,7 @@ class Memories
 
     /**
      * Get all memories
+     * @deprecated Use listPaginated() instead.
      * @return Memory[]
      * @throws LaraException
      */
@@ -25,6 +26,21 @@ class Memories
         return array_map(function ($e) {
             return Memory::fromResponse($e);
         }, $this->client->get("/v2/memories"));
+    }
+
+    /**
+     * List resources with optional name filtering and pagination.
+     * Without options, returns the complete list without pagination.
+     * Providing search, page or size enables pagination; omitted page/size default to 1/20.
+     * @param ResourceQueryOptions|null $options
+     * @return CollectionResult<Memory>
+     * @throws LaraException
+     */
+    public function listPaginated($options = null)
+    {
+        return $this->client->getCollection("/v2/memories", $options === null ? null : $options->toParams(), function ($e) {
+            return Memory::fromResponse($e);
+        });
     }
 
     /**

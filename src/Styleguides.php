@@ -16,6 +16,7 @@ class Styleguides
 
     /**
      * Get all styleguides
+     * @deprecated Use listPaginated() instead.
      * @return Styleguide[]
      * @throws LaraException
      */
@@ -24,6 +25,21 @@ class Styleguides
         return array_map(function ($e) {
             return Styleguide::fromResponse($e);
         }, $this->client->get("/v2/styleguides"));
+    }
+
+    /**
+     * List resources with optional name filtering and pagination.
+     * Without options, returns the complete list without pagination.
+     * Providing search, page or size enables pagination; omitted page/size default to 1/20.
+     * @param ResourceQueryOptions|null $options
+     * @return CollectionResult<Styleguide>
+     * @throws LaraException
+     */
+    public function listPaginated($options = null)
+    {
+        return $this->client->getCollection("/v2/styleguides", $options === null ? null : $options->toParams(), function ($e) {
+            return Styleguide::fromResponse($e);
+        });
     }
 
     /**

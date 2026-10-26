@@ -395,6 +395,37 @@ $memory = $lara->memories->create("MyMemory");
 // Create memory with external ID (MyMemory integration)
 $memory = $lara->memories->create("Memory from MyMemory", "aabb1122");  // Replace with actual external ID
 
+// listPaginated() supports optional name filtering and pagination. Called without options,
+// it returns the complete list of memories without pagination. Providing search, page,
+// or size enables pagination. Each call retrieves one response.
+$memoryCollection = $lara->memories->listPaginated();
+$memories = $memoryCollection->getItems();
+$memoryTotal = $memoryCollection->getTotal(); // Total number of matching resources
+
+// Providing page or size enables pagination (page starts at 1; size: 1-200).
+// The missing parameter defaults to page 1 or size 20.
+$memoryPage = $lara->memories->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2, 'size' => 50]));
+$memoryDefaultSize = $lara->memories->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2])); // Page 2, 20 per page
+$memoryFirstPage = $lara->memories->listPaginated(new \Lara\ResourceQueryOptions(['size' => 50])); // Page 1, 50 per page
+
+// Pass search to filter by displayed name (case- and accent-insensitive).
+// It matches substrings, preserves spaces and supports SQL LIKE wildcards % and _.
+// Search accepts 1–255 characters; the API validates query options.
+// Combine search with page and size to paginate matching results.
+// If omitted, page defaults to 1 and size to 20.
+$memorySearch = $lara->memories->listPaginated(new \Lara\ResourceQueryOptions([
+    'search' => 'Marketing',
+    'page' => 2,
+    'size' => 50
+]));
+
+// getPage() and getSize() expose response metadata, including for empty pages.
+// Both are null for unpaginated collections (no options or empty options).
+$page = $memorySearch->getPage();
+$size = $memorySearch->getSize();
+
+// getAll() is deprecated; use listPaginated() instead.
+
 // Important: To update/overwrite a translation unit you must provide a tuid. Calls without a tuid always create a new unit and will not update existing entries.
 // Add translation to single memory
 $memoryImport = $lara->memories->addTranslation("mem_1A2b3C4d5E6f7G8h9I0jKl", "en-US", "fr-FR", "Hello", "Bonjour", "greeting_001");
@@ -455,6 +486,37 @@ $lara->memories->revokeAccountShare($memory->getId());
 // Create glossary
 $glossary = $lara->glossaries->create("MyGlossary");
 
+// listPaginated() supports optional name filtering and pagination. Called without options,
+// it returns the complete list of glossaries without pagination. Providing search, page,
+// or size enables pagination. Each call retrieves one response.
+$glossaryCollection = $lara->glossaries->listPaginated();
+$glossaries = $glossaryCollection->getItems();
+$glossaryTotal = $glossaryCollection->getTotal(); // Total number of matching resources
+
+// Providing page or size enables pagination (page starts at 1; size: 1-200).
+// The missing parameter defaults to page 1 or size 20.
+$glossaryPage = $lara->glossaries->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2, 'size' => 50]));
+$glossaryDefaultSize = $lara->glossaries->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2])); // Page 2, 20 per page
+$glossaryFirstPage = $lara->glossaries->listPaginated(new \Lara\ResourceQueryOptions(['size' => 50])); // Page 1, 50 per page
+
+// Pass search to filter by displayed name (case- and accent-insensitive).
+// It matches substrings, preserves spaces and supports SQL LIKE wildcards % and _.
+// Search accepts 1–255 characters; the API validates query options.
+// Combine search with page and size to paginate matching results.
+// If omitted, page defaults to 1 and size to 20.
+$glossarySearch = $lara->glossaries->listPaginated(new \Lara\ResourceQueryOptions([
+    'search' => 'Marketing',
+    'page' => 2,
+    'size' => 50
+]));
+
+// getPage() and getSize() expose response metadata, including for empty pages.
+// Both are null for unpaginated collections (no options or empty options).
+$page = $glossarySearch->getPage();
+$size = $glossarySearch->getSize();
+
+// getAll() is deprecated; use listPaginated() instead.
+
 // Import a glossary file (use \Lara\GlossaryFileFormat::TBX for TBX files)
 $glossaryFilePath = "/path/to/your/glossary.csv";
 $glossaryImport = $lara->glossaries->importFile("gls_1A2b3C4d5E6f7G8h9I0jKl", $glossaryFilePath,
@@ -498,8 +560,36 @@ $lara->glossaries->revokeAccountShare($glossary->getId());
 // Create styleguide
 $styleguide = $lara->styleguides->create("MyStyleguide", "Always use formal language.");
 
-// List all styleguides
-$styleguides = $lara->styleguides->getAll();
+// listPaginated() supports optional name filtering and pagination. Called without options,
+// it returns the complete list of styleguides without pagination. Providing search, page,
+// or size enables pagination. Each call retrieves one response.
+$styleguideCollection = $lara->styleguides->listPaginated();
+$styleguides = $styleguideCollection->getItems();
+$styleguideTotal = $styleguideCollection->getTotal(); // Total number of matching resources
+
+// Providing page or size enables pagination (page starts at 1; size: 1-200).
+// The missing parameter defaults to page 1 or size 20.
+$styleguidePage = $lara->styleguides->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2, 'size' => 50]));
+$styleguideDefaultSize = $lara->styleguides->listPaginated(new \Lara\ResourceQueryOptions(['page' => 2])); // Page 2, 20 per page
+$styleguideFirstPage = $lara->styleguides->listPaginated(new \Lara\ResourceQueryOptions(['size' => 50])); // Page 1, 50 per page
+
+// Pass search to filter by displayed name (case- and accent-insensitive).
+// It matches substrings, preserves spaces and supports SQL LIKE wildcards % and _.
+// Search accepts 1–255 characters; the API validates query options.
+// Combine search with page and size to paginate matching results.
+// If omitted, page defaults to 1 and size to 20.
+$styleguideSearch = $lara->styleguides->listPaginated(new \Lara\ResourceQueryOptions([
+    'search' => 'Marketing',
+    'page' => 2,
+    'size' => 50
+]));
+
+// getPage() and getSize() expose response metadata, including for empty pages.
+// Both are null for unpaginated collections (no options or empty options).
+$page = $styleguideSearch->getPage();
+$size = $styleguideSearch->getSize();
+
+// getAll() is deprecated; use listPaginated() instead.
 
 // Get a specific styleguide
 $styleguide = $lara->styleguides->get("stg_1A2b3C4d5E6f7G8h9I0jKl");

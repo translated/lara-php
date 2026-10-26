@@ -5,6 +5,7 @@ namespace Lara\Internal;
 use CURLFile;
 use Lara\AccessKey;
 use Lara\AuthToken;
+use Lara\CollectionResult;
 use Lara\LaraApiException;
 use Lara\LaraException;
 use Lara\LaraTimeoutException;
@@ -99,6 +100,45 @@ class HttpClient
     {
         $queryString = $this->buildQueryString($params);
         return $this->authenticatedRequest('GET', $path . $queryString, null, null, $headers);
+    }
+
+    /**
+     * @template T
+     * @param string $path
+     * @param array|null $params
+     * @param callable(array): T $mapper Maps a response item to an SDK model.
+     * @return CollectionResult<T>
+     * @throws LaraException
+     */
+    public function getCollection($path, $params, $mapper)
+    {
+        $response = $this->authenticatedRequest('GET', $path . $this->buildQueryString($params), null, null, null, false, false, true);
+        $headers = $response['headers'];
+        $total = $this->readIntegerHeader($headers, 'x-total-count', 0);
+        if ($total === null) {
+            throw new LaraException('Missing or invalid X-Total-Count response header');
+        }
+
+        return new CollectionResult(
+            array_map($mapper, $response['body']),
+            $total,
+            $this->readIntegerHeader($headers, 'x-page', 1),
+            $this->readIntegerHeader($headers, 'x-page-size', 1)
+        );
+    }
+
+    private function readIntegerHeader($headers, $name, $minimum)
+    {
+        if (!isset($headers[$name]) || !preg_match('/^[0-9]+$/D', $headers[$name])) {
+            return null;
+        }
+        $digits = ltrim($headers[$name], '0');
+        $maximum = (string) PHP_INT_MAX;
+        if (strlen($digits) > strlen($maximum) || (strlen($digits) === strlen($maximum) && strcmp($digits, $maximum) > 0)) {
+            return null;
+        }
+        $value = (int) $headers[$name];
+        return $value >= $minimum ? $value : null;
     }
 
     /**
@@ -447,12 +487,13 @@ class HttpClient
      * @param array|null $headers Additional headers
      * @param bool $isRetry Whether this is a retry after token refresh
      * @param bool $returnStream Whether to return a stream instead of parsed response
+     * @param bool $withResponseHeaders Whether to include response headers alongside the JSON body
      * @return mixed Response data or stream resource
      * @throws LaraException
      * @throws LaraTimeoutException
      * @throws LaraApiException
      */
-    private function authenticatedRequest($method, $path, $body = null, $files = null, $headers = null, $isRetry = false, $returnStream = false)
+    private function authenticatedRequest($method, $path, $body = null, $files = null, $headers = null, $isRetry = false, $returnStream = false, $withResponseHeaders = false)
     {
         $requestContext = $this->prepareAuthenticatedRequest($path, $body, $headers);
         $path = $requestContext['path'];
@@ -505,6 +546,26 @@ class HttpClient
             CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
             CURLOPT_TIMEOUT => $this->timeout
         ];
+
+        $responseHeaders = [];
+        if ($withResponseHeaders) {
+            $curlOptions[CURLOPT_HEADERFUNCTION] = function ($curl, $header) use (&$responseHeaders) {
+                $length = strlen($header);
+                if (stripos($header, 'HTTP/') === 0) {
+                    $responseHeaders = [];
+                } else {
+                    $parts = explode(':', $header, 2);
+                    if (count($parts) === 2) {
+                        $name = strtolower(trim($parts[0]));
+                        $value = trim($parts[1], " \t\r\n");
+                        $responseHeaders[$name] = isset($responseHeaders[$name])
+                            ? $responseHeaders[$name] . ', ' . $value
+                            : $value;
+                    }
+                }
+                return $length;
+            };
+        }
 
         if ($returnStream) {
             $curlOptions[CURLOPT_FILE] = $stream;
@@ -560,7 +621,7 @@ class HttpClient
         $responseBody = json_decode($result, true);
 
         if (200 <= $statusCode && $statusCode < 300) {
-            return $responseBody;
+            return $withResponseHeaders ? ['body' => $responseBody, 'headers' => $responseHeaders] : $responseBody;
         }
 
         if ($statusCode === 401 && !$isRetry) {
@@ -568,7 +629,7 @@ class HttpClient
 
             if ($errorMessage === 'jwt expired') {
                 $this->authToken->clearToken();
-                return $this->authenticatedRequest($method, $path, $body, $files, $headers, true, $returnStream);
+                return $this->authenticatedRequest($method, $path, $body, $files, $headers, true, $returnStream, $withResponseHeaders);
             }
         }
 

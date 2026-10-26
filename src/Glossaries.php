@@ -18,6 +18,7 @@ class Glossaries
 
     /**
      * Get all glossaries
+     * @deprecated Use listPaginated() instead.
      * @return Glossary[]
      * @throws LaraException
      */
@@ -26,6 +27,21 @@ class Glossaries
         return array_map(function ($e) {
             return Glossary::fromResponse($e);
         }, $this->client->get("/v2/glossaries"));
+    }
+
+    /**
+     * List resources with optional name filtering and pagination.
+     * Without options, returns the complete list without pagination.
+     * Providing search, page or size enables pagination; omitted page/size default to 1/20.
+     * @param ResourceQueryOptions|null $options
+     * @return CollectionResult<Glossary>
+     * @throws LaraException
+     */
+    public function listPaginated($options = null)
+    {
+        return $this->client->getCollection("/v2/glossaries", $options === null ? null : $options->toParams(), function ($e) {
+            return Glossary::fromResponse($e);
+        });
     }
 
     /**
