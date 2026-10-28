@@ -126,6 +126,7 @@ class Translator
             if ($options->isVerbose() !== null) $data["verbose"] = $options->isVerbose();
             if ($options->getStyle() !== null) $data["style"] = $options->getStyle();
             if ($options->isReasoning() !== null) $data["reasoning"] = $options->isReasoning();
+            if ($options->getEffort() !== null) $data["effort"] = $options->getEffort();
             if ($options->getImageContext() !== null) $data["image_context"] = $options->getImageContext();
             if ($options->getMetadata() !== null) $data["metadata"] = $options->getMetadata();
             if ($options->getProfanitiesDetect() !== null) $data["profanities_detect"] = $options->getProfanitiesDetect();
