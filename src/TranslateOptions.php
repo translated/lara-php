@@ -19,7 +19,7 @@ class TranslateOptions
     private $style = null;
     private $headers = null;
     private $reasoning = null;
-    private $effort = null;
+    private $reasoningEffort = null;
     private $imageContext = null;
     private $metadata = null;
     private $profanitiesDetect = null;
@@ -60,8 +60,8 @@ class TranslateOptions
             $this->setHeaders($options['headers']);
         if (isset($options['reasoning']))
             $this->setReasoning($options['reasoning']);
-        if (isset($options['effort']))
-            $this->setEffort($options['effort']);
+        if (isset($options['reasoningEffort']))
+            $this->setReasoningEffort($options['reasoningEffort']);
         if (isset($options['imageContext']))
             $this->setImageContext($options['imageContext']);
         if (isset($options['metadata']))
@@ -320,17 +320,17 @@ class TranslateOptions
     /**
      * Reasoning effort: "low", "medium", or "high". Requires reasoning=true.
      * Pass null to use the server default. Validation is performed by the API.
-     * @param $effort string|null
+     * @param $reasoningEffort string|null
      */
-    public function setEffort($effort)
+    public function setReasoningEffort($reasoningEffort)
     {
-        $this->effort = $effort;
+        $this->reasoningEffort = $reasoningEffort;
     }
 
     /** @return string|null */
-    public function getEffort()
+    public function getReasoningEffort()
     {
-        return $this->effort;
+        return $this->reasoningEffort;
     }
 
     /**
