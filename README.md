@@ -636,7 +636,6 @@ $options = new TranslateOptions([
     'instructions' => ["instruction"],                        // Translation instructions
     'style' => "fluid",                                       // Translation style (fluid, faithful, creative)
     'contentType' => "text/plain",                            // Content type (text/plain, text/html, etc.)
-    'multiline' => true,                                      // Enable multiline translation
     'timeoutInMillis' => 10000,                               // Request timeout in milliseconds
     'sourceHint' => "en",                                     // Hint for source language detection
     'noTrace' => false,                                       // Disable request tracing
@@ -650,7 +649,6 @@ $options->setAdaptTo(["mem_1A2b3C4d5E6f7G8h9I0jKl", "mem_2XyZ9AbC8dEf7GhI6jKlMn"
 $options->setInstructions(["Formal tone", "Use technical terminology"]);
 $options->setGlossaries(["gls_1A2b3C4d5E6f7G8h9I0jKl", "gls_2XyZ9AbC8dEf7GhI6jKlMn"]);  // Replace with actual glossary IDs
 $options->setContentType("text/html");
-$options->setMultiline(true);
 $options->setTimeoutInMillis(15000);
 $options->setNoTrace(false);
 $options->setVerbose(true);

@@ -160,6 +160,7 @@ class TranslateOptions
     }
 
     /**
+     * @deprecated The multiline option is deprecated.
      * @param $multiline bool|null
      */
     public function setMultiline($multiline)
@@ -168,6 +169,7 @@ class TranslateOptions
     }
 
     /**
+     * @deprecated The multiline option is deprecated.
      * @return bool|null
      */
     public function isMultiline()
